@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="PRESAM.Application/PRESAM.Application.csproj" />
+  <Project Path="PRESAM.Domain/PRESAM.Domain.csproj" />
+  <Project Path="PRESAM.Infrastructure/PRESAM.Infrastructure.csproj" />
+  <Project Path="PRESAM.Web/PRESAM.Web.csproj" />
+</Solution>
