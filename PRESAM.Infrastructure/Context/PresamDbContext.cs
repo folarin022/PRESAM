@@ -45,9 +45,9 @@ namespace PRESAM.Infrastructure.Context
 
             // Seed data
             builder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "Electronics", Description = "Electronic items", IsActive = true, CreatedAt = DateTime.Now },
-                new Category { Id = 2, Name = "Clothing", Description = "Fashion items", IsActive = true, CreatedAt = DateTime.Now },
-                new Category { Id = 3, Name = "Books", Description = "Educational books", IsActive = true, CreatedAt = DateTime.Now }
+                new Category { Id = 1, Name = "Electronics", Description = "Electronic items", ImageUrl = "/images/categories/clothing.jpg", IsActive = true, CreatedAt = DateTime.Now },
+                new Category { Id = 2, Name = "Clothing", Description = "Fashion items", ImageUrl = "/images/categories/electronics.jpg", IsActive = true, CreatedAt = DateTime.Now },
+                new Category { Id = 3, Name = "Books", Description = "Educational books", ImageUrl = "/images/categories/books.jpg", IsActive = true, CreatedAt = DateTime.Now }
             );
         }
     }

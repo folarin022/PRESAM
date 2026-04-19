@@ -1,5 +1,3 @@
-// Web/Program.cs
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PRESAM.Application.Interfaces;
@@ -8,6 +6,7 @@ using PRESAM.Domain.Entities;
 using PRESAM.Domain.Interfaces;
 using PRESAM.Infrastructure.Context;
 using PRESAM.Infrastructure.Repositories;
+using PRESAM.Web.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,20 +22,20 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<PresamDbContext>()
     .AddDefaultTokenProviders();
 
-// Dependency Injection - Repository Layer
+// Dependency Injection - Repositories
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<ICartRepository, ICartRepository>();
-builder.Services.AddScoped<IOrderRepository, IOrderRepository>();
+//builder.Services.AddScoped<ICartRepository, CartRepository>();
+//builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
-// Dependency Injection - Service Layer
+// Dependency Injection - Services
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ICartService, CorsService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
+//builder.Services.AddScoped<ICartService, CartService>();
+//builder.Services.AddScoped<IOrderService, OrderService>();
+//builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // AutoMapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Session for Cart
 builder.Services.AddDistributedMemoryCache();
