@@ -35,7 +35,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 //builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+//builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Session for Cart
 builder.Services.AddDistributedMemoryCache();

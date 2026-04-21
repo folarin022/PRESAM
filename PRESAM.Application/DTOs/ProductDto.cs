@@ -14,6 +14,8 @@ namespace PRESAM.Application.DTOs
         public string ImageUrl { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
+        public DateTime CreatedAt { get; internal set; }
+        public bool IsActive { get; internal set; }
     }
 
     public class CreateProductDto

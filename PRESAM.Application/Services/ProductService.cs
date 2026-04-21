@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using PRESAM.Application.DTOs;
+﻿using PRESAM.Application.DTOs;
 using PRESAM.Application.Interfaces;
 using PRESAM.Domain.Entities;
 using PRESAM.Domain.Interfaces;
@@ -9,48 +8,96 @@ namespace PRESAM.Application.Services
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
-        private readonly IMapper _mapper;
 
-        public ProductService(IProductRepository productRepository, IMapper mapper)
+        public ProductService(IProductRepository productRepository)
         {
             _productRepository = productRepository;
-            _mapper = mapper;
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
         {
             var products = await _productRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<ProductDto>>(products);
+            return products.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                StockQuantity = p.StockQuantity,
+                ImageUrl = p.ImageUrl,
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category?.Name,
+                CreatedAt = p.CreatedAt,
+                IsActive = p.IsActive
+            });
         }
 
         public async Task<ProductDto> GetProductByIdAsync(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
-            return _mapper.Map<ProductDto>(product);
+            if (product == null) return null;
+
+            return new ProductDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                StockQuantity = product.StockQuantity,
+                ImageUrl = product.ImageUrl,
+                CategoryId = product.CategoryId,
+                CategoryName = product.Category?.Name,
+                CreatedAt = product.CreatedAt,
+                IsActive = product.IsActive
+            };
         }
 
         public async Task<ProductDto> CreateProductAsync(CreateProductDto productDto)
         {
-            var product = _mapper.Map<Product>(productDto);
-            // set UTC timestamp here; mapping ignores CreatedAt so set explicitly
-            product.CreatedAt = DateTime.UtcNow;
+            var product = new Product
+            {
+                Name = productDto.Name,
+                Description = productDto.Description,
+                Price = productDto.Price,
+                StockQuantity = productDto.StockQuantity,
+                ImageUrl = productDto.ImageUrl,
+                CategoryId = productDto.CategoryId,
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
+            };
 
             var created = await _productRepository.AddAsync(product);
-            return _mapper.Map<ProductDto>(created);
+
+            return new ProductDto
+            {
+                Id = created.Id,
+                Name = created.Name,
+                Description = created.Description,
+                Price = created.Price,
+                StockQuantity = created.StockQuantity,
+                ImageUrl = created.ImageUrl,
+                CategoryId = created.CategoryId,
+                CategoryName = created.Category?.Name,
+                CreatedAt = created.CreatedAt,
+                IsActive = created.IsActive
+            };
         }
 
         public async Task UpdateProductAsync(ProductDto productDto)
         {
-            // Load existing entity to avoid overwriting fields not present in the DTO
             var existing = await _productRepository.GetByIdAsync(productDto.Id);
             if (existing == null)
             {
-                // Optionally throw a domain-specific exception or return
                 throw new KeyNotFoundException($"Product with id {productDto.Id} not found.");
             }
 
-            // Map incoming DTO onto existing entity to preserve CreatedAt, navigation props, etc.
-            _mapper.Map(productDto, existing);
+            // Manual mapping of updated values
+            existing.Name = productDto.Name;
+            existing.Description = productDto.Description;
+            existing.Price = productDto.Price;
+            existing.StockQuantity = productDto.StockQuantity;
+            existing.ImageUrl = productDto.ImageUrl;
+            existing.CategoryId = productDto.CategoryId;
             existing.UpdatedAt = DateTime.UtcNow;
 
             await _productRepository.UpdateAsync(existing);
@@ -64,13 +111,37 @@ namespace PRESAM.Application.Services
         public async Task<IEnumerable<ProductDto>> GetProductsByCategoryAsync(int categoryId)
         {
             var products = await _productRepository.GetProductsByCategoryAsync(categoryId);
-            return _mapper.Map<IEnumerable<ProductDto>>(products);
+            return products.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                StockQuantity = p.StockQuantity,
+                ImageUrl = p.ImageUrl,
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category?.Name,
+                CreatedAt = p.CreatedAt,
+                IsActive = p.IsActive
+            });
         }
 
         public async Task<IEnumerable<ProductDto>> SearchProductsAsync(string searchTerm)
         {
             var products = await _productRepository.SearchProductsAsync(searchTerm);
-            return _mapper.Map<IEnumerable<ProductDto>>(products);
+            return products.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                StockQuantity = p.StockQuantity,
+                ImageUrl = p.ImageUrl,
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category?.Name,
+                CreatedAt = p.CreatedAt,
+                IsActive = p.IsActive
+            });
         }
     }
 }

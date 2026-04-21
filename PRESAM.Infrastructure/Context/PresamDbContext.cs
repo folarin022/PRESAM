@@ -1,8 +1,6 @@
-﻿// Infrastructure/Data/ApplicationDbContext.cs
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PRESAM.Domain.Entities;
-using System.Reflection.Emit;
 
 namespace PRESAM.Infrastructure.Context
 {
@@ -31,6 +29,12 @@ namespace PRESAM.Infrastructure.Context
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Order>(entity =>
+            {
+                entity.Property(e => e.TotalAmount)
+                    .HasPrecision(18, 2);
+            });
+
             builder.Entity<Order>()
                 .HasOne(o => o.User)
                 .WithMany(u => u.Orders)
@@ -45,9 +49,9 @@ namespace PRESAM.Infrastructure.Context
 
             // Seed data
             builder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "Electronics", Description = "Electronic items", ImageUrl = "/images/categories/clothing.jpg", IsActive = true, CreatedAt = DateTime.Now },
-                new Category { Id = 2, Name = "Clothing", Description = "Fashion items", ImageUrl = "/images/categories/electronics.jpg", IsActive = true, CreatedAt = DateTime.Now },
-                new Category { Id = 3, Name = "Books", Description = "Educational books", ImageUrl = "/images/categories/books.jpg", IsActive = true, CreatedAt = DateTime.Now }
+                new Category { Id = 1, Name = "Electronics", Description = "Electronic items", ImageUrl = "/images/categories/clothing.jpg", IsActive = true, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                new Category { Id = 2, Name = "Clothing", Description = "Fashion items", ImageUrl = "/images/categories/electronics.jpg", IsActive = true, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                new Category { Id = 3, Name = "Books", Description = "Educational books", ImageUrl = "/images/categories/books.jpg", IsActive = true, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)}
             );
         }
     }
