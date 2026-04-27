@@ -1,4 +1,4 @@
-﻿// Web/Controllers/OrderController.cs
+﻿// PRESAM.Web/Controllers/OrderController.cs
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -33,8 +33,10 @@ namespace PRESAM.Web.Controllers
             var userId = await GetCurrentUserId();
             var cart = await _cartService.GetCartAsync(userId);
 
-            if (cart == null || !cart.Items.Any())
+            if (cart == null || cart.Items.Count == 0)
+            {
                 return RedirectToAction("Index", "Cart");
+            }
 
             return View();
         }
@@ -43,7 +45,9 @@ namespace PRESAM.Web.Controllers
         public async Task<IActionResult> Checkout(CreateOrderDto orderDto)
         {
             if (!ModelState.IsValid)
+            {
                 return View(orderDto);
+            }
 
             var userId = await GetCurrentUserId();
             var order = await _orderService.CreateOrderAsync(userId, orderDto);
@@ -58,9 +62,13 @@ namespace PRESAM.Web.Controllers
             return View(orders);
         }
 
-        public async Task<IActionResult> OrderConfirmation(int id)
+        public async Task<IActionResult> OrderConfirmation(Guid id)
         {
             var order = await _orderService.GetOrderAsync(id);
+            if (order == null)
+            {
+                return NotFound();
+            }
             return View(order);
         }
     }

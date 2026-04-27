@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿// PRESAM.Infrastructure/Context/PresamDbContext.cs
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PRESAM.Domain.Entities;
 
@@ -22,36 +23,28 @@ namespace PRESAM.Infrastructure.Context
         {
             base.OnModelCreating(builder);
 
-            // Configure relationships
-            builder.Entity<Cart>()
-                .HasOne(c => c.User)
-                .WithMany(u => u.Carts)
-                .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             builder.Entity<Order>(entity =>
             {
-                entity.Property(e => e.TotalAmount)
-                    .HasPrecision(18, 2);
+                entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
             });
 
-            builder.Entity<Order>()
-                .HasOne(o => o.User)
-                .WithMany(u => u.Orders)
-                .HasForeignKey(o => o.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<OrderItem>(entity =>
+            {
+                entity.Property(e => e.UnitPrice).HasPrecision(18, 2);
+                entity.Property(e => e.TotalPrice).HasPrecision(18, 2);
+            });
 
-            builder.Entity<Product>()
-                .HasOne(p => p.Category)
-                .WithMany(c => c.Products)
-                .HasForeignKey(p => p.CategoryId)
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Product>(entity =>
+            {
+                entity.Property(e => e.Price).HasPrecision(18, 2);
+            });
 
-            // Seed data
+            var fixedDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
             builder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "Electronics", Description = "Electronic items", ImageUrl = "/images/categories/clothing.jpg", IsActive = true, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-                new Category { Id = 2, Name = "Clothing", Description = "Fashion items", ImageUrl = "/images/categories/electronics.jpg", IsActive = true, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-                new Category { Id = 3, Name = "Books", Description = "Educational books", ImageUrl = "/images/categories/books.jpg", IsActive = true, CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)}
+                new Category { Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), Name = "Electronics", Description = "Electronic items", ImageUrl = "/images/electronics.jpg", IsActive = true, CreatedAt = fixedDate },
+                new Category { Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), Name = "Clothing", Description = "Fashion items", ImageUrl = "/images/clothing.jpg", IsActive = true, CreatedAt = fixedDate },
+                new Category { Id = Guid.Parse("33333333-3333-3333-3333-333333333333"), Name = "Books", Description = "Educational books", ImageUrl = "/images/books.jpg", IsActive = true, CreatedAt = fixedDate }
             );
         }
     }

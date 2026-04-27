@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Check Your Email";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PRESAM - Check Your Email</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', sans-serif;
+                background: #f5f7fb;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .message-box {
+                background: white;
+                width: 100%;
+                max-width: 450px;
+                margin: 20px;
+                padding: 45px 35px;
+                border-radius: 24px;
+                text-align: center;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            }
+
+                .message-box i {
+                    font-size: 65px;
+                    color: #2d6a4f;
+                }
+
+                .message-box h1 {
+                    font-size: 28px;
+                    font-weight: 600;
+                    color: #1a1a2e;
+                    margin: 20px 0 10px;
+                }
+
+                .message-box p {
+                    color: #666;
+                    line-height: 1.6;
+                    margin-bottom: 15px;
+                }
+
+            .btn {
+                display: inline-block;
+                padding: 14px 30px;
+                background: #2d6a4f;
+                color: white;
+                text-decoration: none;
+                border-radius: 12px;
+                margin-top: 20px;
+                font-weight: 500;
+            }
+
+                .btn:hover {
+                    background: #1b4d3e;
+                }
+
+            .resend-link {
+                margin-top: 20px;
+                font-size: 13px;
+            }
+
+                .resend-link a {
+                    color: #2d6a4f;
+                }
+    </style>
+</head>
+<body>
+    <div class="message-box">
+        <i class="fas fa-envelope"></i>
+        <h1>Check your email</h1>
+        <p>We sent a confirmation link to your email address.</p>
+        <p>Please check your inbox and click the link to activate your account.</p>
+        
+        <a href="/Account/Login" class="btn">Go to Login</a>
+        
+        <div class="resend-link">
+            Didn't get the email? <a href="/Account/ResendConfirmation">Click here</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -11,7 +11,7 @@ namespace PRESAM.Infrastructure.Repositories
         {
         }
 
-        public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId)
+        public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(Guid categoryId)
         {
             return await _dbSet
                 .Where(p => p.CategoryId == categoryId && p.IsActive)

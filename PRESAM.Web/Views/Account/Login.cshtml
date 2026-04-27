@@ -1,0 +1,217 @@
+﻿@model PRESAM.Application.DTOs.LoginDto
+
+@{
+    ViewData["Title"] = "Welcome Back";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PRESAM - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', sans-serif;
+                background: #f5f7fb;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .login-box {
+                background: white;
+                width: 100%;
+                max-width: 400px;
+                margin: 20px;
+                padding: 40px 35px;
+                border-radius: 24px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            }
+
+            .logo {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+                .logo i {
+                    font-size: 48px;
+                    color: #2d6a4f;
+                    background: #e8f5e9;
+                    padding: 15px;
+                    border-radius: 20px;
+                }
+
+                .logo h1 {
+                    font-size: 28px;
+                    font-weight: 600;
+                    color: #1a1a2e;
+                    margin-top: 15px;
+                }
+
+                .logo p {
+                    font-size: 14px;
+                    color: #666;
+                    margin-top: 5px;
+                }
+
+            .input-group {
+                margin-bottom: 20px;
+            }
+
+                .input-group label {
+                    display: block;
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: #333;
+                    margin-bottom: 8px;
+                }
+
+                .input-group input {
+                    width: 100%;
+                    padding: 14px 16px;
+                    border: 1.5px solid #e0e0e0;
+                    border-radius: 12px;
+                    font-size: 14px;
+                    font-family: 'Inter', sans-serif;
+                    transition: all 0.2s;
+                }
+
+                    .input-group input:focus {
+                        outline: none;
+                        border-color: #2d6a4f;
+                        box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+                    }
+
+            .checkbox-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin: 20px 0;
+            }
+
+                .checkbox-row label {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 13px;
+                    color: #555;
+                    cursor: pointer;
+                }
+
+                .checkbox-row a {
+                    color: #2d6a4f;
+                    text-decoration: none;
+                    font-size: 13px;
+                }
+
+                    .checkbox-row a:hover {
+                        text-decoration: underline;
+                    }
+
+            .btn {
+                width: 100%;
+                padding: 14px;
+                background: #2d6a4f;
+                border: none;
+                border-radius: 12px;
+                color: white;
+                font-size: 15px;
+                font-weight: 600;
+                font-family: 'Inter', sans-serif;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+                .btn:hover {
+                    background: #1b4d3e;
+                    transform: translateY(-1px);
+                }
+
+            .signup-link {
+                text-align: center;
+                margin-top: 25px;
+                font-size: 13px;
+                color: #666;
+            }
+
+                .signup-link a {
+                    color: #2d6a4f;
+                    text-decoration: none;
+                    font-weight: 500;
+                }
+
+            .error-msg {
+                background: #fee;
+                border: 1px solid #fcc;
+                color: #c0392b;
+                padding: 12px;
+                border-radius: 10px;
+                font-size: 12px;
+                margin-bottom: 20px;
+            }
+
+            .text-danger {
+                font-size: 11px;
+                color: #e74c3c;
+                margin-top: 5px;
+                display: block;
+            }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div class="logo">
+            <i class="fas fa-store"></i>
+            <h1>PRESAM</h1>
+            <p>Your shopping partner</p>
+        </div>
+
+        <form method="post" asp-action="Login">
+            <div asp-validation-summary="ModelOnly" class="error-msg"></div>
+
+            <div class="input-group">
+                <label>Email</label>
+                <input asp-for="Email" type="email" placeholder="Enter your email" autofocus />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input asp-for="Password" type="password" placeholder="Enter your password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="checkbox-row">
+                <label>
+                    <input asp-for="RememberMe" type="checkbox" />
+                    Keep me signed in
+                </label>
+                <a href="/Account/ForgotPassword">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn">Sign In</button>
+
+            <div class="signup-link">
+                New here? <a href="/Account/Register">Create an account</a>
+            </div>
+        </form>
+    </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 10px; margin-bottom: 20px;">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+</body>
+</html>

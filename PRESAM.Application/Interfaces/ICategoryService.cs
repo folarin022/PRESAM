@@ -5,9 +5,9 @@ namespace PRESAM.Application.Interfaces
     public interface ICategoryService
     {
         Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync();
-        Task<CategoryDto> GetCategoryByIdAsync(int id);
+        Task<CategoryDto> GetCategoryByIdAsync(Guid id);
         Task<CategoryDto> CreateCategoryAsync(CategoryDto categoryDto);
         Task UpdateCategoryAsync(CategoryDto categoryDto);
-        Task DeleteCategoryAsync(int id);
+        Task DeleteCategoryAsync(Guid id);
     }
 }

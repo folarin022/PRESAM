@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
 
 namespace PRESAM.Domain.Entities
 {
@@ -11,7 +9,7 @@ namespace PRESAM.Domain.Entities
         public string Address { get; set; } = string.Empty;
         public DateTime RegistrationDate { get; set; }
 
-        public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
-        public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+        public virtual ICollection<Cart> Carts { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
     }
 }

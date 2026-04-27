@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿// PRESAM.Web/Controllers/CartController.cs
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PRESAM.Application.DTOs;
 using PRESAM.Application.Interfaces;
@@ -27,41 +29,73 @@ namespace PRESAM.Web.Controllers
         {
             var userId = await GetCurrentUserId();
             if (userId == null)
+            {
                 return RedirectToAction("Login", "Account");
+            }
 
             var cart = await _cartService.GetCartAsync(userId);
             return View(cart);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
+        public async Task<IActionResult> AddToCart(Guid productId, int quantity = 1)
         {
             var userId = await GetCurrentUserId();
             if (userId == null)
+            {
                 return RedirectToAction("Login", "Account");
+            }
 
             await _cartService.AddToCartAsync(userId, productId, quantity);
             return RedirectToAction("Index");
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateCart(int cartItemId, int quantity)
+        public async Task<IActionResult> UpdateCart(Guid cartItemId, int quantity)
         {
             var userId = await GetCurrentUserId();
             if (userId != null)
+            {
                 await _cartService.UpdateCartItemAsync(userId, cartItemId, quantity);
+            }
 
             return RedirectToAction("Index");
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveFromCart(int cartItemId)
+        public async Task<IActionResult> RemoveFromCart(Guid cartItemId)
         {
             var userId = await GetCurrentUserId();
             if (userId != null)
+            {
                 await _cartService.RemoveFromCartAsync(userId, cartItemId);
+            }
 
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ClearCart()
+        {
+            var userId = await GetCurrentUserId();
+            if (userId != null)
+            {
+                await _cartService.ClearCartAsync(userId);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> GetCartCount()
+        {
+            var userId = await GetCurrentUserId();
+            if (userId == null)
+            {
+                return Json(0);
+            }
+
+            var cart = await _cartService.GetCartAsync(userId);
+            return Json(cart?.TotalItems ?? 0);
         }
     }
 }

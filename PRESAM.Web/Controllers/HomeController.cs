@@ -23,7 +23,7 @@ namespace PRESAM.Web.Controllers
             return View(products);
         }
 
-        public async Task<IActionResult> ProductDetails(int id)
+        public async Task<IActionResult> ProductDetails(Guid id)
         {
             var product = await _productService.GetProductByIdAsync(id);
             if (product == null)

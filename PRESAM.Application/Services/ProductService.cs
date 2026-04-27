@@ -32,7 +32,7 @@ namespace PRESAM.Application.Services
             });
         }
 
-        public async Task<ProductDto> GetProductByIdAsync(int id)
+        public async Task<ProductDto> GetProductByIdAsync(Guid id)
         {
             var product = await _productRepository.GetByIdAsync(id);
             if (product == null) return null;
@@ -56,6 +56,7 @@ namespace PRESAM.Application.Services
         {
             var product = new Product
             {
+                Id = Guid.NewGuid(),
                 Name = productDto.Name,
                 Description = productDto.Description,
                 Price = productDto.Price,
@@ -91,7 +92,6 @@ namespace PRESAM.Application.Services
                 throw new KeyNotFoundException($"Product with id {productDto.Id} not found.");
             }
 
-            // Manual mapping of updated values
             existing.Name = productDto.Name;
             existing.Description = productDto.Description;
             existing.Price = productDto.Price;
@@ -103,12 +103,12 @@ namespace PRESAM.Application.Services
             await _productRepository.UpdateAsync(existing);
         }
 
-        public async Task DeleteProductAsync(int id)
+        public async Task DeleteProductAsync(Guid id)
         {
             await _productRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<ProductDto>> GetProductsByCategoryAsync(int categoryId)
+        public async Task<IEnumerable<ProductDto>> GetProductsByCategoryAsync(Guid categoryId)
         {
             var products = await _productRepository.GetProductsByCategoryAsync(categoryId);
             return products.Select(p => new ProductDto
