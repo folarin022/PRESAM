@@ -11,15 +11,75 @@ namespace PRESAM.Application.Services
         private readonly IOrderRepository _orderRepository;
         private readonly ICartRepository _cartRepository;
         private readonly IProductRepository _productRepository;
+        private readonly PaymentCalculatorService _paymentCalculator;
 
         public OrderService(
             IOrderRepository orderRepository,
             ICartRepository cartRepository,
-            IProductRepository productRepository)
+            IProductRepository productRepository,
+            PaymentCalculatorService paymentCalculator)
         {
             _orderRepository = orderRepository;
             _cartRepository = cartRepository;
             _productRepository = productRepository;
+            _paymentCalculator = paymentCalculator;
+        }
+
+        private string GenerateOrderNumber()
+        {
+            return $"PRESAM-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
+        }
+
+        private PaymentPlan GetPaymentPlanEnum(string planType)
+        {
+            return planType switch
+            {
+                "FullPayment" => PaymentPlan.FullPayment,
+                "Weekly4" => PaymentPlan.Weekly4,
+                "Weekly8" => PaymentPlan.Weekly8,
+                "Weekly12" => PaymentPlan.Weekly12,
+                "Monthly3" => PaymentPlan.Monthly3,
+                "Monthly6" => PaymentPlan.Monthly6,
+                "Monthly12" => PaymentPlan.Monthly12,
+                _ => PaymentPlan.FullPayment
+            };
+        }
+
+        private int GetInstallmentCount(string planType)
+        {
+            return planType switch
+            {
+                "Weekly4" => 4,
+                "Weekly8" => 8,
+                "Weekly12" => 12,
+                "Monthly3" => 3,
+                "Monthly6" => 6,
+                "Monthly12" => 12,
+                _ => 1
+            };
+        }
+
+        private OrderDto MapToOrderDto(Order order)
+        {
+            return new OrderDto
+            {
+                Id = order.Id,
+                OrderNumber = order.OrderNumber,
+                OrderDate = order.OrderDate,
+                TotalAmount = order.TotalAmount,
+                Status = order.Status.ToString(),
+                ShippingAddress = order.ShippingAddress,
+                PaymentMethod = order.PaymentMethod,
+                PaymentReference = order.PaymentReference,
+                Items = order.OrderItems?.Select(item => new OrderItemDto
+                {
+                    Id = item.Id,
+                    ProductName = item.ProductName,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice,
+                    TotalPrice = item.TotalPrice
+                }).ToList() ?? new List<OrderItemDto>()
+            };
         }
 
         public async Task<OrderDto> CreateOrderAsync(string userId, CreateOrderDto orderDto)
@@ -30,8 +90,8 @@ namespace PRESAM.Application.Services
                 throw new InvalidOperationException("Cart is empty. Cannot create order.");
             }
 
-            var orderNumber = $"ORD-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
             var totalAmount = cart.CartItems.Sum(item => item.Quantity * (item.Product?.Price ?? 0));
+            var orderNumber = GenerateOrderNumber();
 
             var order = new Order
             {
@@ -113,29 +173,6 @@ namespace PRESAM.Application.Services
 
             order.UpdatedAt = DateTime.UtcNow;
             await _orderRepository.UpdateAsync(order);
-        }
-
-        private OrderDto MapToOrderDto(Order order)
-        {
-            return new OrderDto
-            {
-                Id = order.Id,
-                OrderNumber = order.OrderNumber,
-                OrderDate = order.OrderDate,
-                TotalAmount = order.TotalAmount,
-                Status = order.Status.ToString(),
-                ShippingAddress = order.ShippingAddress,
-                PaymentMethod = order.PaymentMethod,
-                PaymentReference = order.PaymentReference,
-                Items = order.OrderItems?.Select(item => new OrderItemDto
-                {
-                    Id = item.Id,
-                    ProductName = item.ProductName,
-                    Quantity = item.Quantity,
-                    UnitPrice = item.UnitPrice,
-                    TotalPrice = item.TotalPrice
-                }).ToList() ?? new List<OrderItemDto>()
-            };
         }
     }
 }

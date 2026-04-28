@@ -16,9 +16,7 @@
             --accent: #c6a43f;
             --accent-hover: #d4b856;
             --border: #2a2a2a;
-            --success: #2ecc71;
             --danger: #e74c3c;
-            --warning: #f39c12;
         }
         [data-theme="light"] {
             --bg-primary: #ffffff;
@@ -30,74 +28,101 @@
             --accent-hover: #1b4d3e;
             --border: #e0e0e0;
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             transition: all 0.3s ease;
         }
+
+        /* Navbar */
         .navbar {
             background: var(--bg-secondary);
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 16px 30px;
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Logo */
         .logo {
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent) 0%, #e8c97a 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
             text-decoration: none;
         }
+        .logo span {
+            color: var(--accent);
+            font-weight: 800;
+        }
         .logo i {
-            margin-right: 8px;
+            margin-right: 6px;
             color: var(--accent);
         }
+
+        /* Hamburger Menu Button (Hidden on desktop) */
+        .menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* Navigation Links */
         .nav-links {
             display: flex;
-            gap: 40px;
             align-items: center;
-            flex-wrap: wrap;
+            gap: 32px;
         }
         .nav-links a {
             text-decoration: none;
             color: var(--text-secondary);
             font-weight: 500;
-            transition: all 0.3s;
-            font-size: 15px;
+            font-size: 14px;
+            transition: all 0.2s;
         }
         .nav-links a:hover {
             color: var(--accent);
         }
+
+        /* Right side items */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Theme Toggle */
         .theme-toggle {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 50px;
-            padding: 8px 18px;
+            border-radius: 40px;
+            padding: 6px 14px;
             cursor: pointer;
-            transition: all 0.3s;
         }
         .theme-toggle:hover {
             border-color: var(--accent);
         }
+
+        /* Auth Buttons */
         .btn-login {
             border: 1px solid var(--accent);
             color: var(--accent) !important;
-            padding: 8px 28px;
-            border-radius: 50px;
-            transition: all 0.3s;
+            padding: 8px 22px;
+            border-radius: 40px;
         }
         .btn-login:hover {
             background: var(--accent);
@@ -106,13 +131,8 @@
         .btn-register {
             background: var(--accent);
             color: white !important;
-            padding: 8px 28px;
-            border-radius: 50px;
-            transition: all 0.3s;
-        }
-        .btn-register:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
+            padding: 8px 22px;
+            border-radius: 40px;
         }
         .logout-btn {
             background: none;
@@ -120,33 +140,70 @@
             color: var(--text-secondary);
             cursor: pointer;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 15px;
-            transition: all 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         .logout-btn:hover {
             color: var(--danger);
         }
+
+        /* Cart Icon */
         .cart-icon {
             position: relative;
         }
         .cart-badge {
             position: absolute;
-            top: -10px;
-            right: -14px;
+            top: -8px;
+            right: -12px;
             background: var(--accent);
             color: black;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
+            font-size: 9px;
+            padding: 2px 5px;
             border-radius: 50%;
         }
-        main {
-            min-height: calc(100vh - 250px);
-            padding: 50px 0;
+
+        /* Mobile Menu (Hidden by default) */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
         }
+        .mobile-menu a, .mobile-menu form {
+            padding: 12px 0;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+        .mobile-menu a:hover {
+            color: var(--accent);
+        }
+        .mobile-menu .logout-btn {
+            padding: 12px 0;
+            width: 100%;
+            text-align: left;
+        }
+
+        /* Main Content */
+        main {
+            min-height: calc(100vh - 200px);
+            padding: 40px 0;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        /* Footer */
         .footer {
             background: var(--bg-secondary);
-            padding: 60px 40px 30px;
+            padding: 50px 40px 30px;
             border-top: 1px solid var(--border);
             margin-top: 60px;
         }
@@ -154,23 +211,19 @@
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 50px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
         }
         .footer-section h4 {
             color: var(--accent);
-            margin-bottom: 20px;
-            font-size: 18px;
+            margin-bottom: 16px;
+            font-size: 16px;
         }
         .footer-section p, .footer-section a {
             color: var(--text-secondary);
             text-decoration: none;
-            line-height: 2;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        .footer-section a:hover {
-            color: var(--accent);
+            line-height: 1.8;
+            font-size: 13px;
         }
         .copyright {
             text-align: center;
@@ -178,163 +231,200 @@
             margin-top: 40px;
             border-top: 1px solid var(--border);
             color: var(--text-secondary);
-            font-size: 13px;
+            font-size: 12px;
         }
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 30px;
-        }
+
+        /* Premium Card */
         .premium-card {
             background: var(--bg-card);
-            border-radius: 24px;
-            padding: 30px;
+            border-radius: 20px;
+            padding: 25px;
             border: 1px solid var(--border);
             transition: all 0.3s;
         }
         .premium-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             border-color: var(--accent);
         }
+
+        /* Buttons */
         .btn-premium {
             background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
             color: white;
             border: none;
-            padding: 12px 32px;
+            padding: 12px 28px;
             border-radius: 50px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
         }
-        .btn-premium:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(198, 164, 63, 0.3);
-        }
-        .premium-input {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 14px 18px;
-            color: var(--text-primary);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            width: 100%;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-        .premium-input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-        @@media (max-width: 768px) {
+
+        /* Responsive - Show hamburger on tablet/mobile */
+        @@media (max-width: 900px) {
             .navbar {
-                padding: 15px 20px;
-                flex-direction: column;
-                gap: 15px;
+                padding: 12px 20px;
             }
+            
+            /* Hide desktop nav links and right items on mobile */
             .nav-links {
-                justify-content: center;
-                gap: 25px;
+                display: none;
             }
-            main {
-                padding: 30px 0;
+            .nav-right {
+                display: none;
             }
+            
+            /* Show hamburger button */
+            .menu-btn {
+                display: block;
+            }
+            
+            /* Show mobile menu when active */
+            .mobile-menu.active {
+                display: flex;
+            }
+            
             .container {
                 padding: 0 20px;
             }
-            .premium-card {
-                padding: 20px;
-            }
         }
-        @@media (max-width: 480px) {
-            .nav-links {
-                gap: 15px;
-            }
-            .btn-login, .btn-register {
-                padding: 6px 18px;
-                font-size: 13px;
+        
+        /* Desktop: hide mobile menu */
+        @@media (min-width: 901px) {
+            .mobile-menu {
+                display: none !important;
             }
         }
     </style>
 </head>
 <body>
+
     <nav class="navbar">
-        <a href="/" class="logo">
-            <i class="fas fa-gem"></i> PRESAM
-        </a>
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/Product/Index">Shop</a>
+        <div class="navbar-container">
+            <!-- Logo -->
+            <a href="/" class="logo">
+                <i class="fas fa-gem"></i> PRE<span>SAM</span>
+            </a>
+
+            <!-- Desktop Navigation Links -->
+            <div class="nav-links">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a href="/">Home</a>
+                    <a href="/Product/Index">Shop</a>
+                    <a href="/Cart/Index" class="cart-icon">
+                        Cart <span class="cart-badge" id="cartCount" style="display:none;">0</span>
+                    </a>
+                    <a href="/Order/MyOrders">Orders</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a href="/Admin/Dashboard">Admin</a>
+                    }
+                }
+                else
+                {
+                    <a href="/">Home</a>
+                    <a href="/Product/Index">Shop</a>
+                }
+            </div>
+
+            <!-- Desktop Right Side -->
+            <div class="nav-right">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                        <button type="submit" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a href="/Account/Login" class="btn-login">Sign In</a>
+                    <a href="/Account/Register" class="btn-register">Join</a>
+                }
+                
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </div>
+            </div>
+
+            <!-- Hamburger Menu Button (Mobile only) -->
+            <button class="menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div class="mobile-menu" id="mobileMenu">
             @if (User.Identity.IsAuthenticated)
             {
-                <a href="/Cart/Index" class="cart-icon">
-                    <i class="fas fa-shopping-bag"></i> Cart
-                    <span class="cart-badge" id="cartCount" style="display:none;">0</span>
-                </a>
+                <a href="/">Home</a>
+                <a href="/Product/Index">Shop</a>
+                <a href="/Cart/Index">Cart</a>
                 <a href="/Order/MyOrders">Orders</a>
                 @if (User.IsInRole("Admin"))
                 {
                     <a href="/Admin/Dashboard">Admin</a>
                 }
-                <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                <form asp-controller="Account" asp-action="Logout" method="post">
                     <button type="submit" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Exit
+                        <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </form>
             }
             else
             {
-                <a href="/Account/Login" class="btn-login">Sign In</a>
-                <a href="/Account/Register" class="btn-register">Join Now</a>
+                <a href="/">Home</a>
+                <a href="/Product/Index">Shop</a>
+                <a href="/Account/Login">Sign In</a>
+                <a href="/Account/Register">Join Now</a>
             }
-        </div>
-        <div class="theme-toggle" onclick="toggleTheme()">
-            <i class="fas fa-moon" id="themeIcon"></i>
+            
+            <div class="theme-toggle" onclick="toggleTheme(); toggleMobileMenu();">
+                <i class="fas fa-moon"></i> Dark/Light
+            </div>
         </div>
     </nav>
-    
+
     <main>
         <div class="container">
             @RenderBody()
         </div>
     </main>
-    
+
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
                 <h4><i class="fas fa-gem"></i> PRESAM</h4>
                 <p>Premium shopping experience</p>
-                <p>Quality products, best prices</p>
             </div>
             <div class="footer-section">
                 <h4>Quick Links</h4>
                 <p><a href="/">Home</a></p>
                 <p><a href="/Product/Index">Shop</a></p>
-                <p><a href="/Cart/Index">Cart</a></p>
                 <p><a href="/Order/MyOrders">Orders</a></p>
             </div>
             <div class="footer-section">
                 <h4>Support</h4>
                 <p><a href="#">FAQ</a></p>
-                <p><a href="#">Shipping Info</a></p>
-                <p><a href="#">Returns Policy</a></p>
-                <p><a href="#">Privacy Policy</a></p>
+                <p><a href="#">Contact</a></p>
             </div>
             <div class="footer-section">
                 <h4>Contact</h4>
                 <p><i class="fas fa-envelope"></i> support@presam.com</p>
-                <p><i class="fas fa-phone"></i> +234 123 456 7890</p>
-                <p><i class="fas fa-map-marker-alt"></i> Lagos, Nigeria</p>
             </div>
         </div>
         <div class="copyright">
             <p>&copy; 2025 PRESAM. All rights reserved.</p>
         </div>
     </footer>
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('active');
+        }
+
         function toggleTheme() {
             const html = document.documentElement;
             const current = html.getAttribute('data-theme');
@@ -348,7 +438,7 @@
                 icon.className = 'fas fa-moon';
             }
         }
-        
+
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -359,22 +449,22 @@
                 icon.className = 'fas fa-moon';
             }
         }
-        
+
         function updateCartCount() {
             @if (User.Identity.IsAuthenticated)
             {
                 <text>
                 $.get('/Cart/GetCartCount', function(data) {
                     if (data > 0) {
-                        $('#cartCount').text(data).show();
+                        $('.cart-badge').text(data).show();
                     } else {
-                        $('#cartCount').hide();
+                        $('.cart-badge').hide();
                     }
                 });
                 </text>
             }
         }
-        
+
         $(document).ready(function() {
             updateCartCount();
         });

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRESAM.Infrastructure.Context;
 
@@ -11,9 +12,11 @@ using PRESAM.Infrastructure.Context;
 namespace PRESAM.Infrastructure.Migrations
 {
     [DbContext(typeof(PresamDbContext))]
-    partial class PresamDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260428115608_AddInstallmentPaymentSystem")]
+    partial class AddInstallmentPaymentSystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

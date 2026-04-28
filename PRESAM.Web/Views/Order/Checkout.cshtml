@@ -1,20 +1,144 @@
-﻿@model PRESAM.Application.DTOs.CreateOrderDto
+﻿@model PRESAM.Application.DTOs.CheckoutDto
+
 @{
     ViewData["Title"] = "Checkout";
 }
-<div class="container" style="max-width: 600px;">
+
+<div class="container">
+    <div class="premium-card" style="margin-bottom: 30px;">
+        <h2 style="margin-bottom: 20px;">Order Summary</h2>
+        
+        @foreach (var item in Model.Items)
+        {
+            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border);">
+                <span>@item.ProductName x @item.Quantity</span>
+                <span>₦@item.TotalPrice.ToString("N0")</span>
+            </div>
+        }
+        
+        <div style="margin-top: 15px;">
+            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                <span>Subtotal:</span>
+                <span>₦@Model.SubTotal.ToString("N0")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                <span>Shipping Fee:</span>
+                <span>₦@Model.ShippingFee.ToString("N0")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+                <span>Tax (7.5%):</span>
+                <span>₦@Model.TaxAmount.ToString("N0")</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 10px 0; font-weight: bold; border-top: 2px solid var(--accent); margin-top: 10px;">
+                <span>Grand Total:</span>
+                <span>₦@Model.GrandTotal.ToString("N0")</span>
+            </div>
+        </div>
+    </div>
+
     <div class="premium-card">
-        <h2 style="margin-bottom: 20px;">Checkout</h2>
-        <form method="post">
-            <textarea asp-for="ShippingAddress" class="premium-input" placeholder="Shipping Address" rows="3" style="margin-bottom: 15px;" required></textarea>
-            <select asp-for="PaymentMethod" class="premium-input" style="margin-bottom: 15px;" required>
+        <h2 style="margin-bottom: 20px;">Choose Payment Plan</h2>
+        
+        <div style="display: grid; gap: 15px; margin-bottom: 30px;">
+            @foreach (var option in Model.PaymentOptions)
+            {
+                <label style="display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer;">
+                    <input type="radio" name="PaymentPlan" value="@option.PlanType" onchange="updatePaymentSummary(this)"
+                           data-total="@option.TotalAmount"
+                           data-installment="@option.InstallmentAmount"
+                           data-desc="@option.Description"
+                           data-interest="@option.InterestAmount" />
+                    
+                    <div style="flex: 1;">
+                        <strong>@option.Description</strong>
+                        @if (option.InterestRate > 0)
+                        {
+                            <span style="color: var(--warning); font-size: 12px; margin-left: 10px;">+@option.InterestRate% interest</span>
+                        }
+                        else
+                        {
+                            <span style="color: var(--success); font-size: 12px; margin-left: 10px;">No interest</span>
+                        }
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 5px;">
+                            Shipping: ₦@option.ShippingFee.ToString("N0") | Tax: ₦@option.TaxAmount.ToString("N0")
+                            @if (option.InterestAmount > 0)
+                            {
+                                <span> | Interest: ₦@option.InterestAmount.ToString("N0")</span>
+                            }
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        @if (option.PlanType == "FullPayment")
+                        {
+                            <strong style="font-size: 18px; color: var(--accent);">₦@option.TotalAmount.ToString("N0")</strong>
+                        }
+                        else
+                        {
+                            <div><strong style="font-size: 16px; color: var(--accent);">₦@option.InstallmentAmount.ToString("N0")</strong> <span style="font-size: 12px;">/payment</span></div>
+                            <small style="font-size: 11px;">Total: ₦@option.TotalAmount.ToString("N0")</small>
+                        }
+                    </div>
+                </label>
+            }
+        </div>
+
+        <div id="paymentSummary" style="background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 25px; display: none;">
+            <h3>Payment Summary</h3>
+            <div id="summaryDetails"></div>
+        </div>
+
+        <form method="post" id="checkoutForm">
+            <textarea name="ShippingAddress" class="premium-input" placeholder="Shipping Address" rows="3" style="margin-bottom: 15px;" required></textarea>
+            
+            <select name="PaymentMethod" class="premium-input" style="margin-bottom: 20px;" required>
                 <option value="">Select Payment Method</option>
                 <option value="Cash">Cash on Delivery</option>
                 <option value="Card">Credit/Debit Card</option>
                 <option value="Mobile Money">Mobile Money</option>
+                <option value="Bank Transfer">Bank Transfer</option>
             </select>
-            <input asp-for="PaymentReference" class="premium-input" placeholder="Payment Reference (optional)" style="margin-bottom: 20px;" />
-            <button type="submit" class="btn-premium" style="width: 100%;">Place Order</button>
+            
+            <input type="hidden" name="SelectedPaymentPlan" id="SelectedPaymentPlan" />
+            <input type="hidden" name="TotalAmount" id="TotalAmount" />
+            
+            <button type="submit" class="btn-premium" style="width: 100%;">
+                <i class="fas fa-check-circle"></i> Place Order
+            </button>
         </form>
     </div>
 </div>
+
+<script>
+    function updatePaymentSummary(radio) {
+        const summaryDiv = document.getElementById('paymentSummary');
+        const summaryDetails = document.getElementById('summaryDetails');
+        const selectedPlan = document.getElementById('SelectedPaymentPlan');
+        const totalAmount = document.getElementById('TotalAmount');
+        
+        selectedPlan.value = radio.value;
+        totalAmount.value = radio.getAttribute('data-total');
+        
+        if (radio.value === 'FullPayment') {
+            summaryDetails.innerHTML = `
+                <p><strong>Payment Type:</strong> One-time full payment</p>
+                <p><strong>Total Amount:</strong> ₦${parseInt(radio.getAttribute('data-total')).toLocaleString()}</p>
+                <p>You will pay the full amount once.</p>
+            `;
+        } else {
+            const installment = parseInt(radio.getAttribute('data-installment')).toLocaleString();
+            const total = parseInt(radio.getAttribute('data-total')).toLocaleString();
+            const desc = radio.getAttribute('data-desc');
+            const interest = parseInt(radio.getAttribute('data-interest')).toLocaleString();
+            
+            summaryDetails.innerHTML = `
+                <p><strong>Payment Plan:</strong> ${desc}</p>
+                <p><strong>Each Payment:</strong> ₦${installment}</p>
+                <p><strong>Total to Pay:</strong> ₦${total}</p>
+                <p><strong>Additional Interest:</strong> ₦${interest}</p>
+                <p>You will receive payment reminders for each due date.</p>
+            `;
+        }
+        
+        summaryDiv.style.display = 'block';
+    }
+</script>

@@ -32,6 +32,27 @@
             }
         </div>
     </div>
+
+    @if (User.Identity.IsAuthenticated && Model.StockQuantity > 0)
+    {
+        <div style="display: flex; gap: 15px; margin-top: 20px;">
+            <form action="/Cart/AddToCart" method="post">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <input type="number" name="quantity" value="1" min="1" style="width: 80px; padding: 10px; margin-right: 10px;" />
+                <button type="submit" class="btn-premium" style="background: var(--bg-card); color: var(--accent);">
+                    <i class="fas fa-cart-plus"></i> Add to Cart
+                </button>
+            </form>
+        
+            <form action="/Order/BuyNow" method="post">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <input type="number" name="quantity" value="1" min="1" style="width: 80px; padding: 10px; margin-right: 10px;" />
+                <button type="submit" class="btn-premium">
+                    <i class="fas fa-bolt"></i> Buy Now
+                </button>
+            </form>
+        </div>
+    }
 </div>
 <script>
     function deleteProduct(id) { if(confirm('Delete this product?')) $.post('/Product/Delete', { id: id }).done(function() { window.location='/Product/Index'; }); }

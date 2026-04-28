@@ -10,5 +10,6 @@ namespace PRESAM.Domain.Interfaces
         Task<Cart> GetCartByUserIdAsync(string userId);
         Task<CartItem> GetCartItemAsync(Guid cartId, Guid productId);
         Task ClearCartAsync(Guid cartId);
+        Task UpdateCartItemAsync(CartItem cartItem);
     }
 }
