@@ -1,0 +1,19 @@
+﻿@model PRESAM.Application.DTOs.UserDto
+@{
+    ViewData["Title"] = "User Details";
+}
+<div class="container" style="max-width: 600px;">
+    <div class="premium-card">
+        <h2 style="margin-bottom: 20px;">User Details</h2>
+        <div style="display: grid; gap: 15px;">
+            <div><strong>Name:</strong> @Model.FirstName @Model.LastName</div>
+            <div><strong>Email:</strong> @Model.Email</div>
+            <div><strong>Phone:</strong> @Model.PhoneNumber</div>
+            <div><strong>Address:</strong> @Model.Address</div>
+            <div><strong>Registered:</strong> @Model.RegistrationDate.ToString("MMM dd, yyyy")</div>
+            <div><strong>Orders:</strong> @Model.TotalOrders</div>
+            <div><strong>Total Spent:</strong> ₦@Model.TotalSpent.ToString("N0")</div>
+        </div>
+        <a href="/Admin/Users" class="btn-premium" style="display: inline-block; margin-top: 20px;">Back to Users</a>
+    </div>
+</div>

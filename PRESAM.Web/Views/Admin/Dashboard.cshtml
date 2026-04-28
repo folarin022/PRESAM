@@ -1,0 +1,17 @@
+﻿@model PRESAM.Application.DTOs.AdminDashboardDto
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+<div class="container">
+    <h2 style="margin-bottom: 30px;">Admin Dashboard</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
+        <div class="premium-card" style="text-align: center;"><i class="fas fa-users" style="font-size: 40px; color: var(--accent);"></i><h3>@Model.TotalUsers</h3><p>Users</p></div>
+        <div class="premium-card" style="text-align: center;"><i class="fas fa-box" style="font-size: 40px; color: var(--accent);"></i><h3>@Model.TotalProducts</h3><p>Products</p></div>
+        <div class="premium-card" style="text-align: center;"><i class="fas fa-shopping-cart" style="font-size: 40px; color: var(--accent);"></i><h3>@Model.TotalOrders</h3><p>Orders</p></div>
+        <div class="premium-card" style="text-align: center;"><i class="fas fa-clock" style="font-size: 40px; color: var(--warning);"></i><h3>@Model.PendingOrders</h3><p>Pending</p></div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <div class="premium-card"><h3>Recent Orders</h3><hr>@if(Model.RecentOrders.Any()){foreach(var o in Model.RecentOrders){<div>#@o.OrderNumber - ₦@o.TotalAmount - @o.Status</div>}}else{<p>No orders</p>}</div>
+        <div class="premium-card"><h3>Recent Users</h3><hr>@if(Model.RecentUsers.Any()){foreach(var u in Model.RecentUsers){<div>@u.FirstName @u.LastName - @u.Email</div>}}else{<p>No users</p>}</div>
+    </div>
+</div>

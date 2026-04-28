@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,327 +7,265 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <style>
-            :root {
-                --bg-primary: #0a0a0a;
-                --bg-secondary: #111111;
-                --bg-card: #1a1a1a;
-                --text-primary: #ffffff;
-                --text-secondary: #a0a0a0;
-                --accent: #c6a43f;
-                --accent-hover: #d4b856;
-                --border: #2a2a2a;
-                --success: #2ecc71;
-                --danger: #e74c3c;
-                --warning: #f39c12;
-            }
-
-            [data-theme="light"] {
-                --bg-primary: #ffffff;
-                --bg-secondary: #f5f7fb;
-                --bg-card: #ffffff;
-                --text-primary: #1a1a2e;
-                --text-secondary: #666666;
-                --accent: #2d6a4f;
-                --accent-hover: #1b4d3e;
-                --border: #e0e0e0;
-            }
-
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family: 'Plus Jakarta Sans', sans-serif;
-                background: var(--bg-primary);
-                color: var(--text-primary);
-                transition: all 0.3s ease;
-            }
-
-            /* Premium Navbar */
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-card: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent: #c6a43f;
+            --accent-hover: #d4b856;
+            --border: #2a2a2a;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+        }
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f7fb;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #666666;
+            --accent: #2d6a4f;
+            --accent-hover: #1b4d3e;
+            --border: #e0e0e0;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        .navbar {
+            background: var(--bg-secondary);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent) 0%, #e8c97a 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+        .logo i {
+            margin-right: 8px;
+            color: var(--accent);
+        }
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .theme-toggle:hover {
+            border-color: var(--accent);
+        }
+        .btn-login {
+            border: 1px solid var(--accent);
+            color: var(--accent) !important;
+            padding: 8px 28px;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        .btn-login:hover {
+            background: var(--accent);
+            color: white !important;
+        }
+        .btn-register {
+            background: var(--accent);
+            color: white !important;
+            padding: 8px 28px;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        .btn-register:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            color: var(--danger);
+        }
+        .cart-icon {
+            position: relative;
+        }
+        .cart-badge {
+            position: absolute;
+            top: -10px;
+            right: -14px;
+            background: var(--accent);
+            color: black;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+        main {
+            min-height: calc(100vh - 250px);
+            padding: 50px 0;
+        }
+        .footer {
+            background: var(--bg-secondary);
+            padding: 60px 40px 30px;
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+        }
+        .footer-section h4 {
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .footer-section p, .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            line-height: 2;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .footer-section a:hover {
+            color: var(--accent);
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 40px;
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+        .premium-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        .premium-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border-color: var(--accent);
+        }
+        .btn-premium {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(198, 164, 63, 0.3);
+        }
+        .premium-input {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 18px;
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            width: 100%;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .premium-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        @@media (max-width: 768px) {
             .navbar {
-                background: var(--bg-secondary);
-                backdrop-filter: blur(10px);
-                padding: 18px 50px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 1px solid var(--border);
-                position: sticky;
-                top: 0;
-                z-index: 1000;
-            }
-
-            .logo {
-                font-size: 26px;
-                font-weight: 800;
-                background: linear-gradient(135deg, var(--accent) 0%, #e8c97a 100%);
-                -webkit-background-clip: text;
-                background-clip: text;
-                color: transparent;
-                text-decoration: none;
-                letter-spacing: -0.5px;
-            }
-
-                .logo i {
-                    margin-right: 8px;
-                    color: var(--accent);
-                }
-
-            .nav-links {
-                display: flex;
-                gap: 35px;
-                align-items: center;
-            }
-
-                .nav-links a {
-                    text-decoration: none;
-                    color: var(--text-secondary);
-                    font-weight: 500;
-                    transition: all 0.3s;
-                    font-size: 14px;
-                    letter-spacing: 0.3px;
-                }
-
-                    .nav-links a:hover {
-                        color: var(--accent);
-                    }
-
-            /* Theme Toggle */
-            .theme-toggle {
-                background: var(--bg-card);
-                border: 1px solid var(--border);
-                border-radius: 50px;
-                padding: 8px 15px;
-                cursor: pointer;
-                display: flex;
-                gap: 10px;
-                align-items: center;
-            }
-
-                .theme-toggle i {
-                    font-size: 14px;
-                    color: var(--text-secondary);
-                }
-
-            /* Buttons */
-            .btn-login {
-                background: transparent;
-                border: 1px solid var(--accent);
-                color: var(--accent) !important;
-                padding: 8px 24px;
-                border-radius: 50px;
-                transition: all 0.3s;
-            }
-
-                .btn-login:hover {
-                    background: var(--accent);
-                    color: white !important;
-                }
-
-            .btn-register {
-                background: var(--accent);
-                color: white !important;
-                padding: 8px 24px;
-                border-radius: 50px;
-            }
-
-                .btn-register:hover {
-                    background: var(--accent-hover);
-                    transform: translateY(-2px);
-                }
-
-            .logout-btn {
-                background: none;
-                border: none;
-                color: var(--text-secondary);
-                cursor: pointer;
-                font-family: 'Plus Jakarta Sans', sans-serif;
-                font-weight: 500;
-            }
-
-                .logout-btn:hover {
-                    color: var(--danger);
-                }
-
-            /* Cart Icon */
-            .cart-icon {
-                position: relative;
-            }
-
-            .cart-badge {
-                position: absolute;
-                top: -8px;
-                right: -12px;
-                background: var(--accent);
-                color: black;
-                font-size: 10px;
-                font-weight: 700;
-                padding: 2px 6px;
-                border-radius: 50%;
-            }
-
-            /* Main Content */
-            main {
-                min-height: calc(100vh - 200px);
-            }
-
-            /* Premium Footer */
-            .footer {
-                background: var(--bg-secondary);
-                padding: 50px 40px 30px;
-                border-top: 1px solid var(--border);
-                margin-top: 60px;
-            }
-
-            .footer-content {
-                max-width: 1200px;
-                margin: 0 auto;
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 40px;
-            }
-
-            .footer-section h4 {
-                color: var(--accent);
-                margin-bottom: 20px;
-                font-size: 18px;
-            }
-
-            .footer-section p, .footer-section a {
-                color: var(--text-secondary);
-                text-decoration: none;
-                line-height: 1.8;
-                font-size: 14px;
-            }
-
-                .footer-section a:hover {
-                    color: var(--accent);
-                }
-
-            .social-icons {
-                display: flex;
+                padding: 15px 20px;
+                flex-direction: column;
                 gap: 15px;
-                margin-top: 15px;
             }
-
-                .social-icons a {
-                    width: 36px;
-                    height: 36px;
-                    background: var(--bg-card);
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.3s;
-                }
-
-                    .social-icons a:hover {
-                        background: var(--accent);
-                        transform: translateY(-3px);
-                    }
-
-            .copyright {
-                text-align: center;
-                padding-top: 40px;
-                margin-top: 40px;
-                border-top: 1px solid var(--border);
-                color: var(--text-secondary);
+            .nav-links {
+                justify-content: center;
+                gap: 25px;
+            }
+            main {
+                padding: 30px 0;
+            }
+            .container {
+                padding: 0 20px;
+            }
+            .premium-card {
+                padding: 20px;
+            }
+        }
+        @@media (max-width: 480px) {
+            .nav-links {
+                gap: 15px;
+            }
+            .btn-login, .btn-register {
+                padding: 6px 18px;
                 font-size: 13px;
             }
-
-            /* Responsive */
-            @media (max-width: 768px) {
-                .navbar {
-                    padding: 15px 20px;
-                    flex-direction: column;
-                    gap: 15px;
-                }
-
-                .nav-links {
-                    flex-wrap: wrap;
-                    justify-content: center;
-                    gap: 20px;
-                }
-
-                .footer-content {
-                    grid-template-columns: 1fr;
-                    text-align: center;
-                }
-
-                .social-icons {
-                    justify-content: center;
-                }
-            }
-
-            /* Container */
-            .container {
-                max-width: 1280px;
-                margin: 0 auto;
-                padding: 0 30px;
-            }
-
-            /* Cards */
-            .premium-card {
-                background: var(--bg-card);
-                border-radius: 20px;
-                padding: 25px;
-                border: 1px solid var(--border);
-                transition: all 0.3s;
-            }
-
-                .premium-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-                    border-color: var(--accent);
-                }
-
-            /* Button */
-            .btn-premium {
-                background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
-                color: white;
-                border: none;
-                padding: 12px 28px;
-                border-radius: 50px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-
-                .btn-premium:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 10px 25px rgba(198, 164, 63, 0.3);
-                }
-
-            /* Inputs */
-            .premium-input {
-                background: var(--bg-primary);
-                border: 1px solid var(--border);
-                border-radius: 12px;
-                padding: 14px 18px;
-                color: var(--text-primary);
-                font-family: 'Plus Jakarta Sans', sans-serif;
-                width: 100%;
-            }
-
-                .premium-input:focus {
-                    outline: none;
-                    border-color: var(--accent);
-                }
+        }
     </style>
 </head>
 <body>
-
     <nav class="navbar">
         <a href="/" class="logo">
             <i class="fas fa-gem"></i> PRESAM
         </a>
-        
         <div class="nav-links">
             <a href="/">Home</a>
             <a href="/Product/Index">Shop</a>
-            
             @if (User.Identity.IsAuthenticated)
             {
                 <a href="/Cart/Index" class="cart-icon">
@@ -335,12 +273,10 @@
                     <span class="cart-badge" id="cartCount" style="display:none;">0</span>
                 </a>
                 <a href="/Order/MyOrders">Orders</a>
-                
                 @if (User.IsInRole("Admin"))
                 {
                     <a href="/Admin/Dashboard">Admin</a>
                 }
-                
                 <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
                     <button type="submit" class="logout-btn">
                         <i class="fas fa-sign-out-alt"></i> Exit
@@ -353,99 +289,94 @@
                 <a href="/Account/Register" class="btn-register">Join Now</a>
             }
         </div>
-        
         <div class="theme-toggle" onclick="toggleTheme()">
-            <i class="fas fa-sun" id="sunIcon"></i>
-            <i class="fas fa-moon" id="moonIcon" style="display: none;"></i>
+            <i class="fas fa-moon" id="themeIcon"></i>
         </div>
     </nav>
-
+    
     <main>
-        @RenderBody()
+        <div class="container">
+            @RenderBody()
+        </div>
     </main>
-
+    
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h4>PRESAM</h4>
+                <h4><i class="fas fa-gem"></i> PRESAM</h4>
                 <p>Premium shopping experience</p>
                 <p>Quality products, best prices</p>
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                </div>
             </div>
             <div class="footer-section">
                 <h4>Quick Links</h4>
                 <p><a href="/">Home</a></p>
                 <p><a href="/Product/Index">Shop</a></p>
                 <p><a href="/Cart/Index">Cart</a></p>
+                <p><a href="/Order/MyOrders">Orders</a></p>
             </div>
             <div class="footer-section">
                 <h4>Support</h4>
                 <p><a href="#">FAQ</a></p>
                 <p><a href="#">Shipping Info</a></p>
                 <p><a href="#">Returns Policy</a></p>
+                <p><a href="#">Privacy Policy</a></p>
             </div>
             <div class="footer-section">
                 <h4>Contact</h4>
                 <p><i class="fas fa-envelope"></i> support@presam.com</p>
                 <p><i class="fas fa-phone"></i> +234 123 456 7890</p>
+                <p><i class="fas fa-map-marker-alt"></i> Lagos, Nigeria</p>
             </div>
         </div>
         <div class="copyright">
             <p>&copy; 2025 PRESAM. All rights reserved.</p>
         </div>
     </footer>
-
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Theme Toggle
         function toggleTheme() {
-        const html = document.documentElement;
-        const currentTheme = html.getAttribute('data-theme');
-        if (currentTheme === 'light') {
-        html.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
-        document.getElementById('sunIcon').style.display = 'block';
-        document.getElementById('moonIcon').style.display = 'none';
-        } else {
-        html.setAttribute('data-theme', 'light');
-        localStorage.setItem('theme', 'light');
-        document.getElementById('sunIcon').style.display = 'none';
-        document.getElementById('moonIcon').style.display = 'block';
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const newTheme = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            const icon = document.getElementById('themeIcon');
+            if (newTheme === 'light') {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
         }
-        }
-
-        // Load saved theme
+        
         const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        document.getElementById('sunIcon').style.display = 'none';
-        document.getElementById('moonIcon').style.display = 'block';
-        } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            const icon = document.getElementById('themeIcon');
+            if (savedTheme === 'light') {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
         }
-
-        // Update cart count
+        
         function updateCartCount() {
-        @if (User.Identity.IsAuthenticated)
-        {
-            <text>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <text>
                 $.get('/Cart/GetCartCount', function(data) {
-                if (data > 0) {
-                $('#cartCount').text(data).show();
-                } else {
-                $('#cartCount').hide();
-                }
+                    if (data > 0) {
+                        $('#cartCount').text(data).show();
+                    } else {
+                        $('#cartCount').hide();
+                    }
                 });
-            </text>
+                </text>
+            }
         }
-        }
-
+        
         $(document).ready(function() {
-        updateCartCount();
+            updateCartCount();
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)

@@ -1,234 +1,27 @@
 ﻿@model PRESAM.Application.DTOs.RegisterDto
-
 @{
     ViewData["Title"] = "Create Account";
-    Layout = null;
 }
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PRESAM - Create Account</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-    <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family: 'Inter', sans-serif;
-                background: #f5f7fb;
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .register-box {
-                background: white;
-                width: 100%;
-                max-width: 450px;
-                margin: 20px;
-                padding: 40px 35px;
-                border-radius: 24px;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            }
-
-            .logo {
-                text-align: center;
-                margin-bottom: 25px;
-            }
-
-                .logo i {
-                    font-size: 42px;
-                    color: #2d6a4f;
-                    background: #e8f5e9;
-                    padding: 12px;
-                    border-radius: 18px;
-                }
-
-                .logo h1 {
-                    font-size: 26px;
-                    font-weight: 600;
-                    color: #1a1a2e;
-                    margin-top: 12px;
-                }
-
-                .logo p {
-                    font-size: 13px;
-                    color: #666;
-                    margin-top: 4px;
-                }
-
-            .input-group {
-                margin-bottom: 16px;
-            }
-
-                .input-group label {
-                    display: block;
-                    font-size: 13px;
-                    font-weight: 500;
-                    color: #333;
-                    margin-bottom: 6px;
-                }
-
-                .input-group input {
-                    width: 100%;
-                    padding: 13px 16px;
-                    border: 1.5px solid #e0e0e0;
-                    border-radius: 12px;
-                    font-size: 14px;
-                    font-family: 'Inter', sans-serif;
-                    transition: all 0.2s;
-                }
-
-                    .input-group input:focus {
-                        outline: none;
-                        border-color: #2d6a4f;
-                        box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
-                    }
-
-            .row {
-                display: flex;
-                gap: 15px;
-            }
-
-                .row .input-group {
-                    flex: 1;
-                }
-
-            .btn {
-                width: 100%;
-                padding: 14px;
-                background: #2d6a4f;
-                border: none;
-                border-radius: 12px;
-                color: white;
-                font-size: 15px;
-                font-weight: 600;
-                font-family: 'Inter', sans-serif;
-                cursor: pointer;
-                margin-top: 10px;
-                transition: all 0.2s;
-            }
-
-                .btn:hover {
-                    background: #1b4d3e;
-                    transform: translateY(-1px);
-                }
-
-            .login-link {
-                text-align: center;
-                margin-top: 25px;
-                font-size: 13px;
-                color: #666;
-            }
-
-                .login-link a {
-                    color: #2d6a4f;
-                    text-decoration: none;
-                    font-weight: 500;
-                }
-
-                    .login-link a:hover {
-                        text-decoration: underline;
-                    }
-
-            .error-msg {
-                background: #fee;
-                border: 1px solid #fcc;
-                color: #c0392b;
-                padding: 10px;
-                border-radius: 10px;
-                font-size: 12px;
-                margin-bottom: 20px;
-            }
-
-            .text-danger {
-                font-size: 11px;
-                color: #e74c3c;
-                margin-top: 4px;
-                display: block;
-            }
-    </style>
-</head>
-<body>
-    <div class="register-box">
-        <div class="logo">
-            <i class="fas fa-store"></i>
-            <h1>PRESAM</h1>
-            <p>Join our shopping family</p>
-        </div>
-
+<div class="container" style="max-width: 500px;">
+    <div class="premium-card">
+        <h2 style="text-align: center; margin-bottom: 20px;">Create Account</h2>
         <form method="post">
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="error-msg">
-                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                    {
-                        <span>@error.ErrorMessage</span>
-                        <br />
-                    }
-                </div>
-            }
-
-            <div class="row">
-                <div class="input-group">
-                    <label>First name</label>
-                    <input asp-for="FirstName" placeholder="John" />
-                    <span asp-validation-for="FirstName" class="text-danger"></span>
-                </div>
-
-                <div class="input-group">
-                    <label>Last name</label>
-                    <input asp-for="LastName" placeholder="Doe" />
-                    <span asp-validation-for="LastName" class="text-danger"></span>
-                </div>
+            <div asp-validation-summary="ModelOnly" style="color: var(--danger); margin-bottom: 15px;"></div>
+            <div style="display: flex; gap: 15px;">
+                <div style="flex:1;"><input asp-for="FirstName" class="premium-input" placeholder="First name" /></div>
+                <div style="flex:1;"><input asp-for="LastName" class="premium-input" placeholder="Last name" /></div>
             </div>
-
-            <div class="input-group">
-                <label>Email</label>
-                <input asp-for="Email" type="email" placeholder="john@example.com" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-
-            <div class="input-group">
-                <label>Phone number</label>
-                <input asp-for="PhoneNumber" placeholder="08012345678" />
-                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-            </div>
-
-            <div class="input-group">
-                <label>Address</label>
-                <input asp-for="Address" placeholder="Your home address" />
-                <span asp-validation-for="Address" class="text-danger"></span>
-            </div>
-
-            <div class="row">
-                <div class="input-group">
-                    <label>Password</label>
-                    <input asp-for="Password" type="password" placeholder="Create password" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-
-                <div class="input-group">
-                    <label>Confirm password</label>
-                    <input asp-for="ConfirmPassword" type="password" placeholder="Type again" />
-                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                </div>
-            </div>
-
-            <button type="submit" class="btn">Create Account</button>
-
-            <div class="login-link">
-                Already have an account? <a href="/Account/Login">Sign in</a>
-            </div>
+            <span asp-validation-for="FirstName" style="color: var(--danger); font-size: 12px;"></span>
+            <input asp-for="Email" class="premium-input" placeholder="Email address" style="margin-top: 15px;" />
+            <span asp-validation-for="Email" style="color: var(--danger); font-size: 12px;"></span>
+            <input asp-for="PhoneNumber" class="premium-input" placeholder="Phone number" style="margin-top: 15px;" />
+            <input asp-for="Address" class="premium-input" placeholder="Address" style="margin-top: 15px;" />
+            <input asp-for="Password" type="password" class="premium-input" placeholder="Password" style="margin-top: 15px;" />
+            <span asp-validation-for="Password" style="color: var(--danger); font-size: 12px;"></span>
+            <input asp-for="ConfirmPassword" type="password" class="premium-input" placeholder="Confirm password" style="margin-top: 15px;" />
+            <span asp-validation-for="ConfirmPassword" style="color: var(--danger); font-size: 12px;"></span>
+            <button type="submit" class="btn-premium" style="width: 100%; margin-top: 25px;">Create Account</button>
         </form>
+        <p style="text-align: center; margin-top: 20px;">Already have an account? <a href="/Account/Login" style="color: var(--accent);">Sign In</a></p>
     </div>
-</body>
-</html>
+</div>

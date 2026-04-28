@@ -1,0 +1,48 @@
+﻿@model IEnumerable<PRESAM.Application.DTOs.OrderDto>
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div style="padding: 20px 0;">
+    <h2 style="margin-bottom: 35px; font-size: 32px;">My Orders</h2>
+    
+    @if (Model != null && Model.Any())
+    {
+        <div style="display: grid; gap: 25px;">
+            @foreach (var order in Model)
+            {
+                <div class="premium-card" style="padding: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div>
+                            <strong style="font-size: 16px;">Order #@order.OrderNumber</strong>
+                            <br />
+                            <small style="color: var(--text-secondary);">@order.OrderDate.ToString("MMM dd, yyyy")</small>
+                        </div>
+                        <div>
+                            <span style="background: var(--accent); padding: 5px 18px; border-radius: 50px; font-size: 13px;">
+                                @order.Status
+                            </span>
+                        </div>
+                        <div>
+                            <strong style="font-size: 20px; color: var(--accent);">₦@order.TotalAmount.ToString("N0")</strong>
+                        </div>
+                        <div>
+                            <a href="/Order/OrderConfirmation/@order.Id" class="btn-premium" style="padding: 10px 25px; font-size: 14px;">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="premium-card" style="text-align: center; padding: 60px 40px;">
+            <i class="fas fa-box-open" style="font-size: 60px; color: var(--accent); margin-bottom: 20px;"></i>
+            <h3 style="margin-bottom: 15px;">No orders yet</h3>
+            <p style="margin-bottom: 25px; color: var(--text-secondary);">Looks like you haven't placed any orders</p>
+            <a href="/Product/Index" class="btn-premium">Start Shopping</a>
+        </div>
+    }
+</div>

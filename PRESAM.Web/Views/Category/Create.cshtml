@@ -1,0 +1,15 @@
+﻿@model PRESAM.Application.DTOs.CategoryDto
+@{
+    ViewData["Title"] = "Add Category";
+}
+<div class="container" style="max-width: 500px;">
+    <div class="premium-card">
+        <h2 style="margin-bottom: 20px;">Add New Category</h2>
+        <form method="post">
+            <input asp-for="Name" class="premium-input" placeholder="Category name" style="margin-bottom: 15px;" />
+            <textarea asp-for="Description" class="premium-input" placeholder="Description" rows="3" style="margin-bottom: 15px;"></textarea>
+            <input asp-for="ImageUrl" class="premium-input" placeholder="Image URL" style="margin-bottom: 15px;" />
+            <button type="submit" class="btn-premium" style="width: 100%;">Create Category</button>
+        </form>
+    </div>
+</div>

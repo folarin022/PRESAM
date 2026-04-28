@@ -11,5 +11,7 @@ namespace PRESAM.Domain.Entities
 
         public virtual ICollection<Cart> Carts { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
+        public string? EmailConfirmationCode { get; set; }
+        public DateTime? EmailConfirmationCodeExpiry { get; set; }
     }
 }

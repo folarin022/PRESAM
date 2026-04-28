@@ -1,0 +1,38 @@
+﻿@model PRESAM.Application.DTOs.ProductDto
+@{
+    ViewData["Title"] = Model.Name;
+}
+<div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px;">
+        <div><img src="@Model.ImageUrl" style="width: 100%; border-radius: 20px;"></div>
+        <div>
+            <h1 style="font-size: 36px; margin-bottom: 15px;">@Model.Name</h1>
+            <p style="color: var(--accent); margin-bottom: 20px;">@Model.CategoryName</p>
+            <p style="font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 20px;">₦@Model.Price.ToString("N0")</p>
+            <p style="margin-bottom: 20px; line-height: 1.6;">@Model.Description</p>
+            <p style="margin-bottom: 20px;">Stock: @Model.StockQuantity units</p>
+            @if (User.Identity.IsAuthenticated && Model.StockQuantity > 0)
+            {
+                <form action="/Cart/AddToCart" method="post">
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    <input type="number" name="quantity" value="1" min="1" style="width: 80px; padding: 10px; margin-right: 10px;" />
+                    <button type="submit" class="btn-premium">Add to Cart</button>
+                </form>
+            }
+            else if (!User.Identity.IsAuthenticated)
+            {
+                <div style="background: var(--bg-card); padding: 15px; border-radius: 10px;"><i class="fas fa-lock"></i> Please <a href="/Account/Login">login</a> to buy this product</div>
+            }
+            @if (User.IsInRole("Admin"))
+            {
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <a href="/Product/Edit/@Model.Id" class="btn-premium">Edit</a>
+                    <button onclick="deleteProduct('@Model.Id')" class="btn-premium" style="background: var(--danger);">Delete</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    function deleteProduct(id) { if(confirm('Delete this product?')) $.post('/Product/Delete', { id: id }).done(function() { window.location='/Product/Index'; }); }
+</script>

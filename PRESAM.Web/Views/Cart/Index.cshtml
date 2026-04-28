@@ -1,0 +1,37 @@
+﻿@model PRESAM.Application.DTOs.CartDto
+@{
+    ViewData["Title"] = "My Cart";
+}
+<div class="container">
+    <h2 style="margin-bottom: 30px;">My Shopping Cart</h2>
+    @if (Model != null && Model.Items.Any())
+    {
+        <div style="display: grid; grid-template-columns: 1fr 350px; gap: 30px;">
+            <div>
+                @foreach (var item in Model.Items)
+                {
+                    <div class="premium-card" style="display: flex; gap: 20px; margin-bottom: 15px; align-items: center;">
+                        <img src="@item.ProductImage" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10px;">
+                        <div style="flex:1;"><h3>@item.ProductName</h3><p>₦@item.UnitPrice.ToString("N0")</p></div>
+                        <form action="/Cart/UpdateCart" method="post"><input type="hidden" name="cartItemId" value="@item.Id" /><input type="number" name="quantity" value="@item.Quantity" min="1" style="width: 70px; padding: 8px;" onchange="this.form.submit()" /></form>
+                        <p style="font-weight: bold; width: 100px;">₦@item.TotalPrice.ToString("N0")</p>
+                        <form action="/Cart/RemoveFromCart" method="post"><input type="hidden" name="cartItemId" value="@item.Id" /><button type="submit" style="background: var(--danger); border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;"><i class="fas fa-trash"></i></button></form>
+                    </div>
+                }
+                <form action="/Cart/ClearCart" method="post" style="text-align: right;"><button type="submit" class="btn-premium" style="background: var(--danger);">Clear Cart</button></form>
+            </div>
+            <div class="premium-card">
+                <h3 style="margin-bottom: 20px;">Order Summary</h3>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>Items (@Model.TotalItems):</span><span>₦@Model.SubTotal.ToString("N0")</span></div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>Shipping:</span><span>Free</span></div>
+                <hr style="margin: 15px 0;">
+                <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Total:</span><span>₦@Model.SubTotal.ToString("N0")</span></div>
+                <a href="/Order/Checkout" class="btn-premium" style="display: block; text-align: center; margin-top: 20px;">Proceed to Checkout</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="premium-card" style="text-align: center;"><i class="fas fa-shopping-cart" style="font-size: 50px;"></i><h3>Your cart is empty</h3><a href="/Product/Index" class="btn-premium" style="display: inline-block; margin-top: 15px;">Start Shopping</a></div>
+    }
+</div>

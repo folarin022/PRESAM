@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRESAM.Infrastructure.Context;
 
@@ -11,9 +12,11 @@ using PRESAM.Infrastructure.Context;
 namespace PRESAM.Infrastructure.Migrations
 {
     [DbContext(typeof(PresamDbContext))]
-    partial class PresamDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260427215418_Create")]
+    partial class Create
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -444,9 +447,10 @@ namespace PRESAM.Infrastructure.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("EmailConfirmationCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("EmailConfirmationCodeExpiry")
+                    b.Property<DateTime>("EmailConfirmationCodeExpiry")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("EmailConfirmed")

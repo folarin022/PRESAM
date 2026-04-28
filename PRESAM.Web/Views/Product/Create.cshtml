@@ -1,0 +1,30 @@
+﻿@model PRESAM.Application.DTOs.CreateProductDto
+@{
+    ViewData["Title"] = "Add Product";
+    var categories = ViewBag.Categories as IEnumerable<PRESAM.Application.DTOs.CategoryDto>;
+}
+<div class="container" style="max-width: 600px;">
+    <div class="premium-card">
+        <h2 style="margin-bottom: 20px;">Add New Product</h2>
+        <form method="post">
+            <input asp-for="Name" class="premium-input" placeholder="Product name" style="margin-bottom: 15px;" />
+            <textarea asp-for="Description" class="premium-input" placeholder="Description" rows="4" style="margin-bottom: 15px;"></textarea>
+            <div style="display: flex; gap: 15px;">
+                <input asp-for="Price" class="premium-input" placeholder="Price" style="margin-bottom: 15px;" />
+                <input asp-for="StockQuantity" class="premium-input" placeholder="Stock" style="margin-bottom: 15px;" />
+            </div>
+            <input asp-for="ImageUrl" class="premium-input" placeholder="Image URL" style="margin-bottom: 15px;" />
+            <select asp-for="CategoryId" class="premium-input" style="margin-bottom: 15px;">
+                <option value="">Select Category</option>
+                @if (categories != null)
+                {
+                    foreach (var cat in categories)
+                    {
+                        <option value="@cat.Id">@cat.Name</option>
+                    }
+                }
+            </select>
+            <button type="submit" class="btn-premium" style="width: 100%;">Create Product</button>
+        </form>
+    </div>
+</div>

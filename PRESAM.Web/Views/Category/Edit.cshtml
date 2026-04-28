@@ -1,0 +1,17 @@
+﻿@model PRESAM.Application.DTOs.CategoryDto
+@{
+    ViewData["Title"] = "Edit Category";
+}
+<div class="container" style="max-width: 500px;">
+    <div class="premium-card">
+        <h2 style="margin-bottom: 20px;">Edit Category</h2>
+        <form method="post">
+            <input type="hidden" asp-for="Id" />
+            <input asp-for="Name" class="premium-input" placeholder="Category name" style="margin-bottom: 15px;" />
+            <textarea asp-for="Description" class="premium-input" placeholder="Description" rows="3" style="margin-bottom: 15px;"></textarea>
+            <input asp-for="ImageUrl" class="premium-input" placeholder="Image URL" style="margin-bottom: 15px;" />
+            <label><input asp-for="IsActive" type="checkbox" /> Active</label>
+            <button type="submit" class="btn-premium" style="width: 100%; margin-top: 20px;">Save Changes</button>
+        </form>
+    </div>
+</div>

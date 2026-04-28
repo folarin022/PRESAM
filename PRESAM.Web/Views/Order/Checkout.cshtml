@@ -1,0 +1,20 @@
+﻿@model PRESAM.Application.DTOs.CreateOrderDto
+@{
+    ViewData["Title"] = "Checkout";
+}
+<div class="container" style="max-width: 600px;">
+    <div class="premium-card">
+        <h2 style="margin-bottom: 20px;">Checkout</h2>
+        <form method="post">
+            <textarea asp-for="ShippingAddress" class="premium-input" placeholder="Shipping Address" rows="3" style="margin-bottom: 15px;" required></textarea>
+            <select asp-for="PaymentMethod" class="premium-input" style="margin-bottom: 15px;" required>
+                <option value="">Select Payment Method</option>
+                <option value="Cash">Cash on Delivery</option>
+                <option value="Card">Credit/Debit Card</option>
+                <option value="Mobile Money">Mobile Money</option>
+            </select>
+            <input asp-for="PaymentReference" class="premium-input" placeholder="Payment Reference (optional)" style="margin-bottom: 20px;" />
+            <button type="submit" class="btn-premium" style="width: 100%;">Place Order</button>
+        </form>
+    </div>
+</div>

@@ -32,7 +32,8 @@ namespace PRESAM.Infrastructure.SeedData
                     Email = adminEmail,
                     FirstName = "Admin",
                     LastName = "User",
-                    RegistrationDate = DateTime.UtcNow
+                    RegistrationDate = DateTime.UtcNow,
+                    EmailConfirmed = true
                 };
 
                 await userManager.CreateAsync(adminUser, "Admin@123");

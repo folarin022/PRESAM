@@ -1,0 +1,14 @@
+﻿@model PRESAM.Application.Interfaces.DashboardStatsDto
+@{
+    ViewData["Title"] = "Statistics";
+}
+<div class="container">
+    <h2 style="margin-bottom: 30px;">Sales Statistics</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
+        <div class="premium-card" style="text-align: center;"><i class="fas fa-chart-line"></i><h3>₦@Model.TotalRevenue.ToString("N0")</h3><p>Total Revenue</p></div>
+        <div class="premium-card" style="text-align: center;"><i class="fas fa-calendar-week"></i><h3>₦@Model.MonthlyRevenue.ToString("N0")</h3><p>This Month</p></div>
+        <div class="premium-card" style="text-align: center;"><i class="fas fa-check-circle"></i><h3>@Model.DeliveredOrders</h3><p>Completed</p></div>
+        <div class="premium-card" style="text-align: center;"><i class="fas fa-clock"></i><h3>@Model.PendingOrders</h3><p>Pending</p></div>
+    </div>
+    <div class="premium-card"><h3>Order Status Breakdown</h3><hr><div>Pending: @Model.PendingOrders</div><div>Processing: @Model.ProcessingOrders</div><div>Shipped: @Model.ShippedOrders</div><div>Delivered: @Model.DeliveredOrders</div><div>Cancelled: @Model.CancelledOrders</div></div>
+</div>

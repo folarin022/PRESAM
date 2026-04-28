@@ -1,0 +1,19 @@
+﻿@model IEnumerable<PRESAM.Application.DTOs.UserDto>
+@{
+    ViewData["Title"] = "Users";
+}
+<div class="container">
+    <h2 style="margin-bottom: 30px;">All Users</h2>
+    <div class="premium-card">
+        <div style="display: grid; gap: 15px;">
+            @foreach (var user in Model)
+            {
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border);">
+                    <div><strong>@user.FirstName @user.LastName</strong><br /><small>@user.Email</small></div>
+                    <div>@user.TotalOrders orders | ₦@user.TotalSpent.ToString("N0")</div>
+                    <a href="/Admin/UserDetails/@user.Id" class="btn-premium" style="padding: 5px 15px;">View</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

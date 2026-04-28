@@ -1,5 +1,4 @@
-﻿// PRESAM.Application/Services/CartService.cs
-using PRESAM.Application.DTOs;
+﻿using PRESAM.Application.DTOs;
 using PRESAM.Application.Interfaces;
 using PRESAM.Domain.Entities;
 using PRESAM.Domain.Interfaces;
@@ -44,6 +43,7 @@ namespace PRESAM.Application.Services
         public async Task AddToCartAsync(string userId, Guid productId, int quantity)
         {
             var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+
             if (cart == null)
             {
                 cart = new Cart
@@ -56,19 +56,23 @@ namespace PRESAM.Application.Services
                 cart = await _cartRepository.AddAsync(cart);
             }
 
-            // Check if product already in cart
+            var product = await _productRepository.GetByIdAsync(productId);
+            if (product == null)
+            {
+                throw new InvalidOperationException("Product not found");
+            }
+
             var existingItem = cart.CartItems?.FirstOrDefault(i => i.ProductId == productId);
 
             if (existingItem != null)
             {
-                // Update quantity - use UpdateAsync on the cart
                 existingItem.Quantity += quantity;
                 existingItem.UpdatedAt = DateTime.UtcNow;
-                await _cartRepository.UpdateAsync(cart);  // ← Fixed: Use UpdateAsync
+
+                await _cartRepository.UpdateCartItemAsync(existingItem);
             }
             else
             {
-                // Add new item
                 var cartItem = new CartItem
                 {
                     Id = Guid.NewGuid(),
@@ -77,9 +81,13 @@ namespace PRESAM.Application.Services
                     Quantity = quantity,
                     CreatedAt = DateTime.UtcNow
                 };
-                cart.CartItems ??= new List<CartItem>();
+
+                if (cart.CartItems == null)
+                {
+                    cart.CartItems = new List<CartItem>();
+                }
                 cart.CartItems.Add(cartItem);
-                await _cartRepository.UpdateAsync(cart);  
+                await _cartRepository.UpdateAsync(cart);
             }
         }
 

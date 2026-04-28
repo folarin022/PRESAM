@@ -1,0 +1,30 @@
+﻿@model PRESAM.Application.DTOs.OrderDto
+@{
+    ViewData["Title"] = "Order Confirmation";
+}
+<div class="container" style="max-width: 800px;">
+    <div class="premium-card" style="text-align: center; margin-bottom: 30px;">
+        <i class="fas fa-check-circle" style="font-size: 60px; color: var(--success);"></i>
+        <h2>Order Confirmed!</h2>
+        <p>Thank you for your purchase. Order #@Model.OrderNumber</p>
+    </div>
+    <div class="premium-card">
+        <h3>Order Details</h3>
+        <hr>
+        <div style="display: grid; gap: 15px;">
+            <div><strong>Order Date:</strong> @Model.OrderDate</div>
+            <div><strong>Status:</strong> @Model.Status</div>
+            <div><strong>Shipping Address:</strong> @Model.ShippingAddress</div>
+            <div><strong>Payment Method:</strong> @Model.PaymentMethod</div>
+            <h4>Items</h4>
+            <div style="display: grid; gap: 10px;">
+                @foreach (var item in Model.Items)
+                {
+                    <div style="display: flex; justify-content: space-between;"><span>@item.ProductName x @item.Quantity</span><span>₦@item.TotalPrice.ToString("N0")</span></div>
+                }
+                <hr><div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Total</span><span>₦@Model.TotalAmount.ToString("N0")</span></div>
+            </div>
+        </div>
+        <a href="/Product/Index" class="btn-premium" style="display: block; text-align: center; margin-top: 20px;">Continue Shopping</a>
+    </div>
+</div>
