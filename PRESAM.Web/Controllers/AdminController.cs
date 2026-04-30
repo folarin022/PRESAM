@@ -1,7 +1,7 @@
-﻿// PRESAM.Web/Controllers/AdminController.cs
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PRESAM.Application.Interfaces;
+using PRESAM.Domain.Entities;
 
 namespace PRESAM.Web.Controllers
 {
@@ -56,16 +56,47 @@ namespace PRESAM.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateOrderStatus(Guid orderId, string status)
+        public async Task<IActionResult> UpdateOrderStatus([FromBody] UpdateOrderRequest request)
         {
-            await _adminService.UpdateOrderStatusAsync(orderId, status);
-            return RedirectToAction("OrderDetails", new { id = orderId });
+            try
+            {
+                var order = await _orderRepository.GetByIdAsync(Guid.Parse(request.OrderId));
+                if (order == null)
+                {
+                    return Json(new { success = false, message = "Order not found" });
+                }
+
+                order.Status = request.Status switch
+                {
+                    "Pending" => OrderStatus.Pending,
+                    "Processing" => OrderStatus.Processing,
+                    "Shipped" => OrderStatus.Shipped,
+                    "Delivered" => OrderStatus.Delivered,
+                    "Cancelled" => OrderStatus.Cancelled,
+                    _ => order.Status
+                };
+
+                order.UpdatedAt = DateTime.UtcNow;
+                await _orderRepository.UpdateAsync(order);
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         public async Task<IActionResult> Statistics()
         {
             var stats = await _adminService.GetDashboardStatsAsync();
             return View(stats);
+        }
+
+        public class UpdateOrderRequest
+        {
+            public string OrderId { get; set; }
+            public string Status { get; set; }
         }
     }
 }

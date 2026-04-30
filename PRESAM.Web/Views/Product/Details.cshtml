@@ -1,59 +1,75 @@
 ﻿@model PRESAM.Application.DTOs.ProductDto
+
 @{
     ViewData["Title"] = Model.Name;
 }
+
 <div class="container">
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px;">
-        <div><img src="@Model.ImageUrl" style="width: 100%; border-radius: 20px;"></div>
+        <div>
+            <img src="@Model.ImageUrl" style="width: 100%; border-radius: 20px;">
+        </div>
         <div>
             <h1 style="font-size: 36px; margin-bottom: 15px;">@Model.Name</h1>
             <p style="color: var(--accent); margin-bottom: 20px;">@Model.CategoryName</p>
             <p style="font-size: 32px; font-weight: 700; color: var(--accent); margin-bottom: 20px;">₦@Model.Price.ToString("N0")</p>
             <p style="margin-bottom: 20px; line-height: 1.6;">@Model.Description</p>
-            <p style="margin-bottom: 20px;">Stock: @Model.StockQuantity units</p>
-            @if (User.Identity.IsAuthenticated && Model.StockQuantity > 0)
+            
+            @if (Model.StockQuantity > 0)
             {
-                <form action="/Cart/AddToCart" method="post">
-                    <input type="hidden" name="productId" value="@Model.Id" />
-                    <input type="number" name="quantity" value="1" min="1" style="width: 80px; padding: 10px; margin-right: 10px;" />
-                    <button type="submit" class="btn-premium">Add to Cart</button>
-                </form>
+                <p style="margin-bottom: 20px; color: #2ecc71;">In Stock: @Model.StockQuantity units</p>
+                
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div style="display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap;">
+                        <!-- Add to Cart Form -->
+                        <form action="/Cart/AddToCart" method="post" style="display: inline-block;">
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <input type="number" name="quantity" value="1" min="1" max="@Model.StockQuantity" style="width: 80px; padding: 10px; margin-right: 10px;" />
+                            <button type="submit" class="btn-premium" style="background: var(--bg-card); color: var(--accent);">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </form>
+                        
+                        <!-- Buy Now Form -->
+                        <form action="/Order/BuyNow" method="post" style="display: inline-block;">
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <input type="number" name="quantity" value="1" min="1" max="@Model.StockQuantity" style="width: 80px; padding: 10px; margin-right: 10px;" />
+                            <button type="submit" class="btn-premium">
+                                <i class="fas fa-bolt"></i> Buy Now
+                            </button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <div style="margin-top: 20px; padding: 15px; background: var(--bg-card); border-radius: 10px;">
+                        <i class="fas fa-lock"></i> Please <a href="/Account/Login">login</a> to buy this product
+                    </div>
+                }
             }
-            else if (!User.Identity.IsAuthenticated)
+            else
             {
-                <div style="background: var(--bg-card); padding: 15px; border-radius: 10px;"><i class="fas fa-lock"></i> Please <a href="/Account/Login">login</a> to buy this product</div>
+                <p style="margin-bottom: 20px; color: #e74c3c;">Out of Stock</p>
             }
+            
             @if (User.IsInRole("Admin"))
             {
                 <div style="margin-top: 20px; display: flex; gap: 10px;">
-                    <a href="/Product/Edit/@Model.Id" class="btn-premium">Edit</a>
-                    <button onclick="deleteProduct('@Model.Id')" class="btn-premium" style="background: var(--danger);">Delete</button>
+                    <a href="/Product/Edit/@Model.Id" class="btn-premium">Edit Product</a>
+                    <button onclick="deleteProduct('@Model.Id')" class="btn-premium" style="background: #e74c3c;">Delete</button>
                 </div>
             }
         </div>
     </div>
-
-    @if (User.Identity.IsAuthenticated && Model.StockQuantity > 0)
-    {
-        <div style="display: flex; gap: 15px; margin-top: 20px;">
-            <form action="/Cart/AddToCart" method="post">
-                <input type="hidden" name="productId" value="@Model.Id" />
-                <input type="number" name="quantity" value="1" min="1" style="width: 80px; padding: 10px; margin-right: 10px;" />
-                <button type="submit" class="btn-premium" style="background: var(--bg-card); color: var(--accent);">
-                    <i class="fas fa-cart-plus"></i> Add to Cart
-                </button>
-            </form>
-        
-            <form action="/Order/BuyNow" method="post">
-                <input type="hidden" name="productId" value="@Model.Id" />
-                <input type="number" name="quantity" value="1" min="1" style="width: 80px; padding: 10px; margin-right: 10px;" />
-                <button type="submit" class="btn-premium">
-                    <i class="fas fa-bolt"></i> Buy Now
-                </button>
-            </form>
-        </div>
-    }
 </div>
+
 <script>
-    function deleteProduct(id) { if(confirm('Delete this product?')) $.post('/Product/Delete', { id: id }).done(function() { window.location='/Product/Index'; }); }
+    function deleteProduct(id) {
+        if (confirm('Are you sure you want to delete this product?')) {
+            $.post('/Product/Delete', { id: id }).done(function() {
+                window.location.href = '/Product/Index';
+            });
+        }
+    }
 </script>
