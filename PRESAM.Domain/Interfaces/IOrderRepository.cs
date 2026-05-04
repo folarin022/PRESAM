@@ -9,5 +9,6 @@ namespace PRESAM.Domain.Interfaces
     {
         Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId);
         Task<Order> GetOrderWithItemsAsync(Guid orderId);
+        Task<Order> GetByIdAsync(Guid orderId);
     }
 }

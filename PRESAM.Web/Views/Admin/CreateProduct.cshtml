@@ -56,7 +56,6 @@
                         </button>
                     </div>
                 </div>
-                <span asp-validation-for="ProductImage" class="text-danger"></span>
             </div>
             
             <div class="form-group">
@@ -104,12 +103,12 @@
         margin-bottom: 20px;
     }
 
-    .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 500;
-        font-size: 14px;
-    }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
 
     .form-control {
         width: 100%;
@@ -122,10 +121,10 @@
         font-size: 14px;
     }
 
-    .form-control:focus {
-        outline: none;
-        border-color: var(--accent);
-    }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
 
     textarea.form-control {
         resize: vertical;
@@ -159,32 +158,32 @@
         cursor: pointer;
     }
 
-    .image-upload-area:hover {
-        border-color: var(--accent);
-        background: rgba(198, 164, 63, 0.05);
-    }
+        .image-upload-area:hover {
+            border-color: var(--accent);
+            background: rgba(198, 164, 63, 0.05);
+        }
 
     .upload-label {
         cursor: pointer;
         display: block;
     }
 
-    .upload-label i {
-        font-size: 48px;
-        color: var(--accent);
-        margin-bottom: 10px;
-    }
+        .upload-label i {
+            font-size: 48px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
 
-    .upload-label p {
-        margin-bottom: 5px;
-        font-weight: 500;
-        color: var(--text-primary);
-    }
+        .upload-label p {
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
 
-    .upload-label span {
-        font-size: 12px;
-        color: var(--text-secondary);
-    }
+        .upload-label span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
 
     .image-preview {
         position: relative;
@@ -194,12 +193,12 @@
         margin-top: 10px;
     }
 
-    .image-preview img {
-        max-width: 100%;
-        max-height: 200px;
-        border-radius: 12px;
-        object-fit: cover;
-    }
+        .image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
 
     .remove-image {
         position: absolute;
@@ -218,9 +217,9 @@
         transition: all 0.2s;
     }
 
-    .remove-image:hover {
-        transform: scale(1.1);
-    }
+        .remove-image:hover {
+            transform: scale(1.1);
+        }
 
     .form-actions {
         display: flex;
@@ -243,10 +242,10 @@
         transition: all 0.2s;
     }
 
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(198, 164, 63, 0.3);
-    }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(198, 164, 63, 0.3);
+        }
 
     .btn-secondary {
         display: inline-flex;
@@ -262,10 +261,10 @@
         transition: all 0.2s;
     }
 
-    .btn-secondary:hover {
-        border-color: var(--accent);
-        color: var(--accent);
-    }
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
 
     .alert-error {
         background: rgba(231, 76, 60, 0.1);
@@ -282,13 +281,16 @@
         .premium-card {
             padding: 20px;
         }
+
         .row {
             flex-direction: column;
             gap: 0;
         }
+
         .form-actions {
             flex-direction: column;
         }
+
         .btn-primary, .btn-secondary {
             justify-content: center;
         }

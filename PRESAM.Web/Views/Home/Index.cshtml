@@ -1,55 +1,345 @@
 ﻿@model IEnumerable<PRESAM.Application.DTOs.ProductDto>
+
 @{
-    ViewData["Title"] = "PRESAM - Premium Shopping";
+    ViewData["Title"] = "PRESAM – Home";
     var categories = ViewBag.Categories as IEnumerable<PRESAM.Application.DTOs.CategoryDto>;
+    var featuredProduct = Model?.FirstOrDefault();  // pick first product for hero banner
 }
-<div class="hero" style="background: linear-gradient(135deg, var(--accent) 0%, #1a1a2e 100%); padding: 80px 20px; text-align: center; margin-bottom: 50px;">
-    <h1 style="font-size: 56px; margin-bottom: 15px;">PRESAM</h1>
-    <p style="font-size: 20px; opacity: 0.9;">Premium products, exceptional quality</p>
-    @if (!User.Identity.IsAuthenticated)
-    {
-        <div style="margin-top: 30px;"><a href="/Account/Login" class="btn-premium">Start Shopping</a></div>
-    }
-</div>
-<div class="container">
-    @if (!User.Identity.IsAuthenticated)
-    {
-        <div style="background: var(--bg-card); border-left: 4px solid var(--accent); padding: 15px; border-radius: 10px; margin-bottom: 30px; text-align: center;">
-            <i class="fas fa-lock"></i> Please <a href="/Account/Login" style="color: var(--accent);">login</a> or <a href="/Account/Register" style="color: var(--accent);">register</a> to start shopping
+
+<div class="home-wrapper">
+    <!-- Hero section (like the MacBook banner) -->
+    <div class="hero-banner">
+        <div class="hero-content">
+            <span class="hero-badge">Seamless style</span>
+            <h1 class="hero-title">
+                @(featuredProduct?.Name ?? "New Collection")<br>
+                <span class="accent">@(featuredProduct?.Price.ToString("N0") ?? "Shop now")</span>
+            </h1>
+            <p class="hero-desc">
+                @(featuredProduct?.Description ?? "Discover the latest arrivals with premium quality.")
+            </p>
+            <a href="@(featuredProduct != null ? $"/Product/Details/{featuredProduct.Id}" : "/Product/Index")" class="hero-btn">
+                Shop now <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
-    }
+        <div class="hero-image">
+            <img src="@(featuredProduct?.ImageUrl ?? "/images/placeholder.jpg")" alt="hero">
+        </div>
+    </div>
+
+    <!-- Category chips (exactly like the design) -->
     @if (categories != null && categories.Any())
     {
-        <h2 style="margin-bottom: 25px;">Shop by Category</h2>
-        <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 50px;">
-            @foreach (var cat in categories)
+        <div class="section-header">
+            <h2>Shop by category</h2>
+            <a href="/Product/Index" class="see-all">See all →</a>
+        </div>
+        <div class="category-chips">
+            @foreach (var cat in categories.Take(6))
             {
-                <a href="/Product/ByCategory/@cat.Id" style="text-decoration: none;">
-                    <div style="background: var(--bg-card); padding: 12px 25px; border-radius: 50px; border: 1px solid var(--border);">
-                        <i class="fas fa-tag" style="color: var(--accent);"></i> @cat.Name <span style="color: var(--text-secondary);">(@cat.ProductCount)</span>
-                    </div>
+                <a href="/Product/ByCategory/@cat.Id" class="chip">
+                    <i class="fas fa-tag"></i> @cat.Name
                 </a>
             }
         </div>
     }
-    <h2 style="margin-bottom: 25px;">Featured Products</h2>
+
+    <!-- All products grid -->
+    <div class="section-header">
+        <h2>All products</h2>
+        <a href="/Product/Index" class="see-all">See all →</a>
+    </div>
+
     @if (Model != null && Model.Any())
     {
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px;">
-            @foreach (var product in Model.Take(8))
+        <div class="product-grid">
+            @foreach (var product in Model.Take(12))
             {
-                <div class="premium-card">
-                    <img src="@product.ImageUrl" style="width: 100%; height: 240px; object-fit: cover; border-radius: 15px; margin-bottom: 15px;">
-                    <h3>@product.Name</h3>
-                    <p style="color: var(--text-secondary); font-size: 13px;">@product.CategoryName</p>
-                    <p style="font-size: 24px; font-weight: 700; color: var(--accent); margin: 10px 0;">₦@product.Price.ToString("N0")</p>
-                    <a href="/Product/Details/@product.Id" class="btn-premium" style="display: inline-block; padding: 10px 20px; font-size: 14px;">View Details</a>
+                <div class="product-card">
+                    <div class="card-img">
+                        <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)" alt="@product.Name">
+                        @if (product.StockQuantity > 0)
+                        {
+                            <span class="stock-badge in-stock">In stock</span>
+                        }
+                        else
+                        {
+                            <span class="stock-badge out-stock">Out of stock</span>
+                        }
+                    </div>
+                    <div class="card-info">
+                        <h4>@product.Name</h4>
+                        <p class="price">₦@product.Price.ToString("N0")</p>
+                        <a href="/Product/Details/@product.Id" class="card-link">View details →</a>
+                    </div>
                 </div>
             }
         </div>
     }
     else
     {
-        <p style="text-align: center;">No products available yet.</p>
+        <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h3>No products yet</h3>
+            @if (User.IsInRole("Admin"))
+            {
+                <a href="/Admin/CreateProduct" class="btn-primary">Add your first product</a>
+            }
+            else
+            {
+                <p>Check back soon!</p>
+            }
+        </div>
     }
 </div>
+
+<style>
+    .home-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Hero banner */
+    .hero-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 40px;
+        background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+        border-radius: 30px;
+        padding: 50px 40px;
+        margin-bottom: 60px;
+        flex-wrap: wrap;
+    }
+
+    .hero-content {
+        flex: 1;
+    }
+
+    .hero-badge {
+        display: inline-block;
+        background: rgba(198, 164, 63, 0.15);
+        color: var(--accent);
+        padding: 5px 14px;
+        border-radius: 30px;
+        font-size: 12px;
+        margin-bottom: 20px;
+    }
+
+    .hero-title {
+        font-size: 42px;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 20px;
+    }
+
+        .hero-title .accent {
+            color: var(--accent);
+        }
+
+    .hero-desc {
+        color: var(--text-secondary);
+        margin-bottom: 30px;
+        max-width: 400px;
+    }
+
+    .hero-btn {
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+        color: black;
+        padding: 12px 28px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: 0.2s;
+    }
+
+        .hero-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(198,164,63,0.3);
+        }
+
+    .hero-image {
+        flex: 1;
+        text-align: center;
+    }
+
+        .hero-image img {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 20px;
+        }
+
+    /* Section header */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin: 40px 0 20px 0;
+        flex-wrap: wrap;
+    }
+
+        .section-header h2 {
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+    .see-all {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .see-all:hover {
+            text-decoration: underline;
+        }
+
+    /* Category chips */
+    .category-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 40px;
+    }
+
+    .chip {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 40px;
+        padding: 8px 18px;
+        text-decoration: none;
+        color: var(--text-primary);
+        font-size: 14px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .chip:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+    /* Product grid */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 25px;
+        margin-top: 10px;
+    }
+
+    .product-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: 0.2s;
+    }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+    .card-img {
+        position: relative;
+        height: 220px;
+        background: #f4f4f4;
+    }
+
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .stock-badge {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 30px;
+        font-weight: 600;
+    }
+
+    .in-stock {
+        background: #2ecc71;
+        color: black;
+    }
+
+    .out-stock {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .card-info {
+        padding: 16px;
+    }
+
+        .card-info h4 {
+            font-size: 16px;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+    .price {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 12px;
+    }
+
+    .card-link {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+        .card-link:hover {
+            color: var(--accent);
+        }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: var(--bg-card);
+        border-radius: 30px;
+        margin: 40px 0;
+    }
+
+        .empty-state i {
+            font-size: 70px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+    @@media (max-width: 800px) {
+        .hero-banner {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 32px;
+        }
+
+        .hero-desc {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .product-grid {
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
+    }
+</style>

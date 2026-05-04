@@ -1,19 +1,69 @@
 ﻿@model IEnumerable<PRESAM.Application.DTOs.UserDto>
+
 @{
-    ViewData["Title"] = "Users";
+    ViewData["Title"] = "Manage Users";
 }
+
 <div class="container">
-    <h2 style="margin-bottom: 30px;">All Users</h2>
+    <h2 style="margin-bottom: 30px;">Manage Users</h2>
+    
     <div class="premium-card">
-        <div style="display: grid; gap: 15px;">
-            @foreach (var user in Model)
-            {
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--border);">
-                    <div><strong>@user.FirstName @user.LastName</strong><br /><small>@user.Email</small></div>
-                    <div>@user.TotalOrders orders | ₦@user.TotalSpent.ToString("N0")</div>
-                    <a href="/Admin/UserDetails/@user.Id" class="btn-premium" style="padding: 5px 15px;">View</a>
-                </div>
-            }
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <th style="padding: 12px; text-align: left;">Name</th>
+                        <th style="padding: 12px; text-align: left;">Email</th>
+                        <th style="padding: 12px; text-align: left;">Phone</th>
+                        <th style="padding: 12px; text-align: left;">Role</th>
+                        <th style="padding: 12px; text-align: left;">Actions</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.role-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const userId = this.dataset.userid;
+            const newRole = this.value;
+            
+            fetch('/Admin/UpdateUserRole', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: userId, role: newRole })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Role updated successfully');
+                } else {
+                    alert('Error updating role');
+                }
+            });
+        });
+    });
+
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const userId = this.dataset.userid;
+            if (confirm('Delete this user?')) {
+                fetch('/Admin/DeleteUser', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: userId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            }
+        });
+    });
+</script>
