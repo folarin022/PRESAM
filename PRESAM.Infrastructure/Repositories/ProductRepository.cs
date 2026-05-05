@@ -34,5 +34,19 @@ namespace PRESAM.Infrastructure.Repositories
                 .Include(p => p.Category)
                 .ToListAsync();
         }
+
+        public async Task<Product> GetByIdWithRelationsAsync(Guid id)
+        {
+            return await _dbSet
+                .Include(p => p.Category)
+                .Include(p => p.CartItems)
+                .Include(p => p.OrderItems)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+        public async Task<bool> HasOrderItemsAsync(Guid productId)
+        { return await _context.OrderItems.AnyAsync(oi => oi.ProductId == productId); }
+
+        public async Task<bool> HasCartItemsAsync(Guid productId)
+        { return await _context.CartItems.AnyAsync(ci => ci.ProductId == productId); }
     }
 }

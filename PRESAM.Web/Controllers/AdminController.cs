@@ -351,17 +351,10 @@ namespace PRESAM.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteProduct(Guid id)
+        public async Task<IActionResult> DeleteProduct([FromBody] DeleteProductDto dto)
         {
-            try
-            {
-                await _productService.DeleteProductAsync(id);
-                return Json(new { success = true, message = "Product deleted successfully" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
+            var result = await _productService.DeleteAsync(dto.Id);
+            return Json(new { success = result.Succeeded, message = result.Message });
         }
 
         // Helper method to get all categories for dropdowns
@@ -371,6 +364,11 @@ namespace PRESAM.Web.Controllers
             var categories = await _categoryService.GetAllCategoriesAsync();
             return Json(categories);
         }
+    }
+
+    public class DeleteProductDto
+    {
+        public Guid Id { get; set; }
     }
 
     public class UpdateOrderRequest

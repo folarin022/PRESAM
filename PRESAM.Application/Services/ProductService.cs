@@ -1,32 +1,42 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using PRESAM.Application.DTOs;
 using PRESAM.Application.Interfaces;
 using PRESAM.Domain.Entities;
 using PRESAM.Domain.Interfaces;
-using System.IO;
+using Microsoft.EntityFrameworkCore;
+using PRESAM.Infrastructure.Context;
 
 namespace PRESAM.Application.Services
 {
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepository;
+        private readonly PresamDbContext _dbContext;
+        private readonly IWebHostEnvironment _env;
+        private readonly ILogger<ProductService> _logger;
         private readonly string _imageUploadPath;
 
-        public ProductService(IProductRepository productRepository)
+        public ProductService(IProductRepository productRepository, PresamDbContext dbContext, IWebHostEnvironment env, ILogger<ProductService> logger)
         {
             _productRepository = productRepository;
-            _imageUploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+            _dbContext = dbContext;
+            _env = env;
+            _logger = logger;
+            _imageUploadPath = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "images", "products");
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
         {
-            var products = await _productRepository.GetAllAsync();
+            // Prefer repository method that returns only active products if available
+            var products = await _productRepository.GetActiveProductsAsync();
             return ToDtoList(products);
         }
 
         public async Task<ProductDto> GetProductByIdAsync(Guid id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
+            var product = await _productRepository.GetByIdWithRelationsAsync(id) ?? await _productRepository.GetByIdAsync(id);
             return product == null ? null : MapToDto(product);
         }
 
@@ -69,15 +79,21 @@ namespace PRESAM.Application.Services
             existing.CategoryId = productDto.CategoryId;
             existing.UpdatedAt = DateTime.UtcNow;
 
-            // Handle new image upload
             if (productDto.ProductImage != null && productDto.ProductImage.Length > 0)
             {
                 var newImageUrl = await SaveImageFile(productDto.ProductImage);
-                // Delete old image if it exists and is not the placeholder
-                if (!string.IsNullOrEmpty(existing.ImageUrl) && existing.ImageUrl != "/images/placeholder.jpg")
+                try
                 {
-                    DeleteImageFile(existing.ImageUrl);
+                    if (!string.IsNullOrEmpty(existing.ImageUrl) && existing.ImageUrl != "/images/placeholder.jpg")
+                    {
+                        DeleteImageFile(existing.ImageUrl);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to delete old image for product {ProductId}", existing.Id);
+                }
+
                 existing.ImageUrl = newImageUrl;
             }
 
@@ -86,10 +102,41 @@ namespace PRESAM.Application.Services
 
         public async Task DeleteProductAsync(Guid id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product == null) return;
+            var product = await _productRepository.GetByIdWithRelationsAsync(id) ?? await _productRepository.GetByIdAsync(id);
+            if (product == null)
+                throw new KeyNotFoundException($"Product with id {id} not found.");
 
-            // 1. Delete image file (ignore errors – file might already be missing)
+            var hasOrderItems = false;
+            var hasCartItems = false;
+
+            try
+            {
+                hasOrderItems = await _productRepository.HasOrderItemsAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "HasOrderItemsAsync failed for product {ProductId}", id);
+            }
+
+            try
+            {
+                hasCartItems = await _productRepository.HasCartItemsAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "HasCartItemsAsync failed for product {ProductId}", id);
+            }
+
+            // If product is referenced by orders or carts, soft-delete (deactivate) it
+            if (hasOrderItems || hasCartItems)
+            {
+                product.IsActive = false;
+                product.UpdatedAt = DateTime.UtcNow;
+                await _productRepository.UpdateAsync(product);
+                return;
+            }
+
+            // Delete image first (best-effort)
             try
             {
                 if (!string.IsNullOrEmpty(product.ImageUrl) && product.ImageUrl != "/images/placeholder.jpg")
@@ -99,12 +146,19 @@ namespace PRESAM.Application.Services
             }
             catch (Exception ex)
             {
-                // Log but continue – do not block product deletion
-                Console.WriteLine($"Image deletion failed: {ex.Message}");
+                _logger.LogError(ex, "Failed to delete image file for product {ProductId}", id);
             }
 
-            // 2. Delete product from database
-            await _productRepository.DeleteAsync(id);
+            // Finally remove from repository
+            try
+            {
+                await _productRepository.DeleteAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete product {ProductId} from repository", id);
+                throw; // rethrow so controller can return proper error
+            }
         }
 
         public async Task<IEnumerable<ProductDto>> GetProductsByCategoryAsync(Guid categoryId)
@@ -119,7 +173,6 @@ namespace PRESAM.Application.Services
             return ToDtoList(products);
         }
 
-        // ---------- Helper methods ----------
         private async Task<string> SaveImageFile(IFormFile imageFile)
         {
             try
@@ -139,7 +192,7 @@ namespace PRESAM.Application.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving image: {ex.Message}");
+                _logger.LogError(ex, "Error saving image file");
                 return "/images/placeholder.jpg";
             }
         }
@@ -151,8 +204,15 @@ namespace PRESAM.Application.Services
             var fileName = Path.GetFileName(imageUrl);
             var filePath = Path.Combine(_imageUploadPath, fileName);
 
-            if (File.Exists(filePath))
-                File.Delete(filePath);
+            try
+            {
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to delete image file at {FilePath}", filePath);
+            }
         }
 
         private static ProductDto MapToDto(Product p)
@@ -170,6 +230,33 @@ namespace PRESAM.Application.Services
                 CreatedAt = p.CreatedAt,
                 IsActive = p.IsActive
             };
+        }
+
+        public async Task<Result> DeleteAsync(Guid Id)
+        {
+            var product = await _dbContext.Products.FindAsync(Id);
+
+            if (product == null)
+                return Result.Failure("Product not found");
+
+            var inCart = await _dbContext.CartItems
+                .Where(ci => ci.ProductId == Id)
+                .CountAsync() > 0;
+
+
+            if (inCart)
+                return Result.Failure("Cannot delete product. It exists in active shopping carts.");
+
+            var hasOrders = await _dbContext.OrderItems
+                .AnyAsync(oi => oi.ProductId == Id);
+
+            if (hasOrders)
+                return Result.Failure("Cannot delete product. It has order history.");
+
+            _dbContext.Products.Remove(product);
+            await _dbContext.SaveChangesAsync();
+
+            return Result.Success("Product deleted successfully");
         }
 
         private static List<ProductDto> ToDtoList(IEnumerable<Product> products)

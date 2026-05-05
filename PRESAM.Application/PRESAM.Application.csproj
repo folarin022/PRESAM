@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PRESAM.Domain\PRESAM.Domain.csproj" />
+    <ProjectReference Include="..\PRESAM.Infrastructure\PRESAM.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

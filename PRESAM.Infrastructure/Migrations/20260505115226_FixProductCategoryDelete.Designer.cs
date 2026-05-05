@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PRESAM.Infrastructure.Context;
 
@@ -11,9 +12,11 @@ using PRESAM.Infrastructure.Context;
 namespace PRESAM.Infrastructure.Migrations
 {
     [DbContext(typeof(PresamDbContext))]
-    partial class PresamDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505115226_FixProductCategoryDelete")]
+    partial class FixProductCategoryDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -254,6 +257,38 @@ namespace PRESAM.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Electronic items",
+                            ImageUrl = "/images/electronics.jpg",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "Electronics"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Fashion items",
+                            ImageUrl = "/images/clothing.jpg",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "Clothing"
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Educational books",
+                            ImageUrl = "/images/books.jpg",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "Books"
+                        });
                 });
 
             modelBuilder.Entity("PRESAM.Domain.Entities.InstallmentPayment", b =>

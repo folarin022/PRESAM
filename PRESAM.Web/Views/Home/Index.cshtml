@@ -1,345 +1,428 @@
 ﻿@model IEnumerable<PRESAM.Application.DTOs.ProductDto>
 
 @{
-    ViewData["Title"] = "PRESAM – Home";
+    ViewData["Title"] = "PRESAM - Home";
     var categories = ViewBag.Categories as IEnumerable<PRESAM.Application.DTOs.CategoryDto>;
-    var featuredProduct = Model?.FirstOrDefault();  // pick first product for hero banner
 }
 
-<div class="home-wrapper">
-    <!-- Hero section (like the MacBook banner) -->
+<div class="home-container">
+    <!-- Hero Banner - Compact -->
     <div class="hero-banner">
         <div class="hero-content">
-            <span class="hero-badge">Seamless style</span>
-            <h1 class="hero-title">
-                @(featuredProduct?.Name ?? "New Collection")<br>
-                <span class="accent">@(featuredProduct?.Price.ToString("N0") ?? "Shop now")</span>
-            </h1>
-            <p class="hero-desc">
-                @(featuredProduct?.Description ?? "Discover the latest arrivals with premium quality.")
-            </p>
-            <a href="@(featuredProduct != null ? $"/Product/Details/{featuredProduct.Id}" : "/Product/Index")" class="hero-btn">
-                Shop now <i class="fas fa-arrow-right"></i>
-            </a>
+            <span class="hero-badge">Premium Quality</span>
+            <h1 class="hero-title">Shop the <span class="accent">Best Deals</span> Today</h1>
+            <p class="hero-desc">Discover amazing products at unbeatable prices. Free shipping on orders over ₦50,000.</p>
+            <div class="hero-buttons">
+                <a href="/Product/Index" class="hero-btn">Shop Now →</a>
+            </div>
         </div>
         <div class="hero-image">
-            <img src="@(featuredProduct?.ImageUrl ?? "/images/placeholder.jpg")" alt="hero">
+            <img src="https://picsum.photos/400/300?random=1" alt="Shopping">
         </div>
     </div>
 
-    <!-- Category chips (exactly like the design) -->
+    <!-- Category Chips - Compact -->
     @if (categories != null && categories.Any())
     {
-        <div class="section-header">
-            <h2>Shop by category</h2>
-            <a href="/Product/Index" class="see-all">See all →</a>
-        </div>
-        <div class="category-chips">
-            @foreach (var cat in categories.Take(6))
-            {
-                <a href="/Product/ByCategory/@cat.Id" class="chip">
-                    <i class="fas fa-tag"></i> @cat.Name
-                </a>
-            }
+        <div class="category-section">
+            <div class="section-header">
+                <h2>Shop by Category</h2>
+                <a href="/Product/Index" class="see-all">See all →</a>
+            </div>
+            <div class="category-chips">
+                @foreach (var cat in categories.Take(6))
+                {
+                    <a href="/Product/ByCategory/@cat.Id" class="chip">
+                        <i class="fas fa-tag"></i> @cat.Name <span class="chip-count">(@cat.ProductCount)</span>
+                    </a>
+                }
+            </div>
         </div>
     }
 
-    <!-- All products grid -->
-    <div class="section-header">
-        <h2>All products</h2>
-        <a href="/Product/Index" class="see-all">See all →</a>
+    <!-- Featured Products - Small Cards -->
+    <div class="products-section">
+        <div class="section-header">
+            <h2>Featured Products</h2>
+            <a href="/Product/Index" class="see-all">View all →</a>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="products-grid">
+                @foreach (var product in Model.Take(8))
+                {
+                    <div class="product-card">
+                        <div class="product-badge" style="background: @(product.StockQuantity > 0 ? "#2ecc71" : "#e74c3c");">
+                            @(product.StockQuantity > 0 ? "In Stock" : "Sold Out")
+                        </div>
+                        <div class="product-image">
+                            <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)" alt="@product.Name">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-category">@(product.CategoryName ?? "Uncategorized")</div>
+                            <h3 class="product-name">@product.Name</h3>
+                            <div class="product-price">
+                                <span class="current-price">₦@product.Price.ToString("N0")</span>
+                                <span class="old-price">₦@((product.Price * 1.2m).ToString("N0"))</span>
+                            </div>
+                            <div class="product-footer">
+                                <a href="/Product/Details/@product.Id" class="view-details">View Details <i class="fas fa-arrow-right"></i></a>
+                                @if (User.Identity.IsAuthenticated && product.StockQuantity > 0)
+                                {
+                                    <button onclick="addToCart('@product.Id')" class="add-to-cart">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-products">
+                <i class="fas fa-box-open"></i>
+                <h3>No Products Yet</h3>
+                <p>Check back soon for amazing products!</p>
+            </div>
+        }
     </div>
 
-    @if (Model != null && Model.Any())
-    {
-        <div class="product-grid">
-            @foreach (var product in Model.Take(12))
-            {
-                <div class="product-card">
-                    <div class="card-img">
-                        <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)" alt="@product.Name">
-                        @if (product.StockQuantity > 0)
-                        {
-                            <span class="stock-badge in-stock">In stock</span>
-                        }
-                        else
-                        {
-                            <span class="stock-badge out-stock">Out of stock</span>
-                        }
-                    </div>
-                    <div class="card-info">
-                        <h4>@product.Name</h4>
-                        <p class="price">₦@product.Price.ToString("N0")</p>
-                        <a href="/Product/Details/@product.Id" class="card-link">View details →</a>
-                    </div>
-                </div>
-            }
+    <!-- Features Banner - Compact -->
+    <div class="features-banner">
+        <div class="feature-item">
+            <i class="fas fa-truck"></i>
+            <div>
+                <h4>Free Shipping</h4>
+                <p>On orders over ₦50k</p>
+            </div>
         </div>
-    }
-    else
-    {
-        <div class="empty-state">
-            <i class="fas fa-box-open"></i>
-            <h3>No products yet</h3>
-            @if (User.IsInRole("Admin"))
-            {
-                <a href="/Admin/CreateProduct" class="btn-primary">Add your first product</a>
-            }
-            else
-            {
-                <p>Check back soon!</p>
-            }
+        <div class="feature-item">
+            <i class="fas fa-headset"></i>
+            <div>
+                <h4>24/7 Support</h4>
+                <p>Get help anytime</p>
+            </div>
         </div>
-    }
+        <div class="feature-item">
+            <i class="fas fa-lock"></i>
+            <div>
+                <h4>Secure Payment</h4>
+                <p>100% safe checkout</p>
+            </div>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-undo-alt"></i>
+            <div>
+                <h4>Easy Returns</h4>
+                <p>30-day return policy</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
-    .home-wrapper {
+    .home-container {
         max-width: 1400px;
         margin: 0 auto;
-        padding: 0 20px;
+        padding: 0 30px;
     }
 
-    /* Hero banner */
+    /* Hero Banner - Compact */
     .hero-banner {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 40px;
+        gap: 30px;
         background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
-        border-radius: 30px;
-        padding: 50px 40px;
-        margin-bottom: 60px;
+        border-radius: 24px;
+        padding: 30px 35px;
+        margin-bottom: 40px;
         flex-wrap: wrap;
     }
-
-    .hero-content {
-        flex: 1;
-    }
-
+    .hero-content { flex: 1; }
     .hero-badge {
         display: inline-block;
-        background: rgba(198, 164, 63, 0.15);
-        color: var(--accent);
-        padding: 5px 14px;
-        border-radius: 30px;
-        font-size: 12px;
-        margin-bottom: 20px;
+        background: var(--accent);
+        color: black;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-bottom: 12px;
     }
-
     .hero-title {
-        font-size: 42px;
+        font-size: 34px;
         font-weight: 800;
-        line-height: 1.2;
-        margin-bottom: 20px;
+        margin-bottom: 12px;
     }
-
-        .hero-title .accent {
-            color: var(--accent);
-        }
-
+    .hero-title .accent { color: var(--accent); }
     .hero-desc {
         color: var(--text-secondary);
-        margin-bottom: 30px;
+        margin-bottom: 20px;
         max-width: 400px;
+        font-size: 14px;
     }
-
     .hero-btn {
         background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
         color: black;
-        padding: 12px 28px;
-        border-radius: 50px;
+        padding: 10px 24px;
+        border-radius: 40px;
         text-decoration: none;
         font-weight: 600;
+        font-size: 13px;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
+        gap: 6px;
         transition: 0.2s;
     }
+    .hero-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(198,164,63,0.3); }
+    .hero-image { flex: 1; text-align: center; }
+    .hero-image img { max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 16px; }
 
-        .hero-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(198,164,63,0.3);
-        }
-
-    .hero-image {
-        flex: 1;
-        text-align: center;
+    /* Category Section */
+    .category-section, .products-section {
+        margin-bottom: 40px;
     }
-
-        .hero-image img {
-            max-width: 100%;
-            max-height: 300px;
-            object-fit: contain;
-            border-radius: 20px;
-        }
-
-    /* Section header */
     .section-header {
         display: flex;
         justify-content: space-between;
         align-items: baseline;
-        margin: 40px 0 20px 0;
+        margin-bottom: 20px;
         flex-wrap: wrap;
     }
-
-        .section-header h2 {
-            font-size: 26px;
-            font-weight: 700;
-        }
-
+    .section-header h2 {
+        font-size: 20px;
+        font-weight: 700;
+    }
     .see-all {
         color: var(--accent);
         text-decoration: none;
+        font-size: 12px;
         font-weight: 500;
     }
+    .see-all:hover { text-decoration: underline; }
 
-        .see-all:hover {
-            text-decoration: underline;
-        }
-
-    /* Category chips */
+    /* Category Chips - Compact */
     .category-chips {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 40px;
+        gap: 10px;
     }
-
     .chip {
         background: var(--bg-card);
         border: 1px solid var(--border);
-        border-radius: 40px;
-        padding: 8px 18px;
+        border-radius: 24px;
+        padding: 5px 14px;
         text-decoration: none;
         color: var(--text-primary);
-        font-size: 14px;
+        font-size: 12px;
         transition: all 0.2s;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 5px;
     }
+    .chip:hover {
+        background: var(--accent);
+        color: black;
+        border-color: var(--accent);
+    }
+    .chip i { font-size: 11px; }
+    .chip-count { font-size: 10px; color: var(--text-secondary); }
 
-        .chip:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-    /* Product grid */
-    .product-grid {
+    /* Small Product Cards */
+    .products-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 25px;
-        margin-top: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
     }
-
     .product-card {
         background: var(--bg-card);
         border: 1px solid var(--border);
-        border-radius: 20px;
+        border-radius: 14px;
         overflow: hidden;
-        transition: 0.2s;
-    }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-        }
-
-    .card-img {
+        transition: all 0.25s ease;
         position: relative;
-        height: 220px;
-        background: #f4f4f4;
     }
-
-        .card-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-    .stock-badge {
+    .product-card:hover {
+        transform: translateY(-3px);
+        border-color: var(--accent);
+        box-shadow: 0 8px 16px -6px rgba(0,0,0,0.15);
+    }
+    .product-badge {
         position: absolute;
-        bottom: 10px;
-        left: 10px;
-        font-size: 11px;
-        padding: 4px 10px;
-        border-radius: 30px;
-        font-weight: 600;
-    }
-
-    .in-stock {
-        background: #2ecc71;
+        top: 6px;
+        left: 6px;
         color: black;
-    }
-
-    .out-stock {
-        background: #e74c3c;
-        color: white;
-    }
-
-    .card-info {
-        padding: 16px;
-    }
-
-        .card-info h4 {
-            font-size: 16px;
-            margin-bottom: 6px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-    .price {
-        font-size: 18px;
+        font-size: 8px;
         font-weight: 700;
-        color: var(--accent);
-        margin-bottom: 12px;
+        padding: 2px 7px;
+        border-radius: 14px;
+        z-index: 2;
     }
-
-    .card-link {
+    .product-image {
+        position: relative;
+        height: 140px;
+        overflow: hidden;
+        background: var(--bg-primary);
+    }
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.25s;
+    }
+    .product-card:hover .product-image img { transform: scale(1.04); }
+    .product-info { padding: 10px; }
+    .product-category {
+        font-size: 9px;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 3px;
+    }
+    .product-name {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .product-price {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 8px;
+    }
+    .current-price { font-size: 14px; font-weight: 700; color: var(--accent); }
+    .old-price { font-size: 10px; color: var(--text-secondary); text-decoration: line-through; }
+    .product-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 6px;
+        border-top: 1px solid var(--border);
+    }
+    .view-details {
         color: var(--text-secondary);
         text-decoration: none;
-        font-size: 13px;
+        font-size: 10px;
         font-weight: 500;
+        transition: 0.2s;
     }
+    .view-details:hover { color: var(--accent); }
+    .view-details i { font-size: 8px; transition: transform 0.2s; }
+    .view-details:hover i { transform: translateX(3px); }
+    .add-to-cart {
+        background: var(--accent);
+        border: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        color: black;
+        cursor: pointer;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+    }
+    .add-to-cart:hover { transform: scale(1.05); }
 
-        .card-link:hover {
-            color: var(--accent);
-        }
-
-    /* Empty state */
-    .empty-state {
-        text-align: center;
-        padding: 80px 20px;
+    /* Features Banner - Compact */
+    .features-banner {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
         background: var(--bg-card);
-        border-radius: 30px;
-        margin: 40px 0;
+        border-radius: 20px;
+        padding: 25px 30px;
+        margin-top: 20px;
+        border: 1px solid var(--border);
+    }
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .feature-item i {
+        font-size: 28px;
+        color: var(--accent);
+    }
+    .feature-item h4 {
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+    .feature-item p {
+        font-size: 11px;
+        color: var(--text-secondary);
     }
 
-        .empty-state i {
-            font-size: 70px;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
+    /* Empty State */
+    .empty-products {
+        text-align: center;
+        padding: 40px;
+        background: var(--bg-card);
+        border-radius: 20px;
+    }
+    .empty-products i { font-size: 50px; color: var(--text-secondary); margin-bottom: 15px; }
+    .empty-products h3 { font-size: 18px; margin-bottom: 8px; }
+    .empty-products p { color: var(--text-secondary); font-size: 13px; }
 
-    @@media (max-width: 800px) {
-        .hero-banner {
-            flex-direction: column;
-            text-align: center;
+    /* Mobile Responsive */
+    @@media (max-width: 900px) {
+        .features-banner {
+            grid-template-columns: repeat(2, 1fr);
         }
-
-        .hero-title {
-            font-size: 32px;
-        }
-
-        .hero-desc {
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .product-grid {
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        }
+    }
+    @@media (max-width: 768px) {
+        .home-container { padding: 0 20px; }
+        .hero-title { font-size: 26px; }
+        .hero-banner { padding: 20px; gap: 20px; }
+        .hero-image img { max-height: 150px; }
+        .features-banner { grid-template-columns: 1fr; gap: 15px; }
+        .products-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+        .product-image { height: 120px; }
+    }
+    @@media (max-width: 480px) {
+        .products-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+        .product-image { height: 100px; }
+        .product-info { padding: 8px; }
+        .product-name { font-size: 10px; }
+        .current-price { font-size: 12px; }
+        .view-details { font-size: 9px; }
+        .section-header h2 { font-size: 18px; }
     }
 </style>
+
+<script>
+    function addToCart(productId) {
+        fetch('/Cart/AddToCart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: productId, quantity: 1 })
+        }).then(response => response.ok ? response : Promise.reject())
+          .then(() => {
+              showToast('✓ Added to cart!');
+              if (typeof updateCartCount === 'function') updateCartCount();
+          }).catch(error => console.error('Error:', error));
+    }
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+        toast.style.cssText = `
+            position: fixed; bottom: 30px; right: 30px;
+            background: #2ecc71; color: black; padding: 10px 20px;
+            border-radius: 40px; font-weight: 600; z-index: 9999;
+            font-size: 13px;
+            animation: slideIn 0.3s ease;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+</script>

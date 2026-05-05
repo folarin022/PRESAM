@@ -23,6 +23,7 @@ namespace PRESAM.Infrastructure.Context
         {
             base.OnModelCreating(builder);
 
+            // Precision configurations
             builder.Entity<Order>(entity =>
             {
                 entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
@@ -39,13 +40,36 @@ namespace PRESAM.Infrastructure.Context
                 entity.Property(e => e.Price).HasPrecision(18, 2);
             });
 
-            var fixedDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-            builder.Entity<Category>().HasData(
-                new Category { Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), Name = "Electronics", Description = "Electronic items", ImageUrl = "/images/electronics.jpg", IsActive = true, CreatedAt = fixedDate },
-                new Category { Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), Name = "Clothing", Description = "Fashion items", ImageUrl = "/images/clothing.jpg", IsActive = true, CreatedAt = fixedDate },
-                new Category { Id = Guid.Parse("33333333-3333-3333-3333-333333333333"), Name = "Books", Description = "Educational books", ImageUrl = "/images/books.jpg", IsActive = true, CreatedAt = fixedDate }
-            );
+            builder.Entity<Product>()
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<CartItem>()
+                .HasOne(ci => ci.Product)
+                .WithMany()
+                .HasForeignKey(ci => ci.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<OrderItem>()
+                .HasOne(oi => oi.Product)
+                .WithMany()
+                .HasForeignKey(oi => oi.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<CartItem>()
+                .HasOne(ci => ci.Cart)
+                .WithMany(c => c.CartItems)
+                .HasForeignKey(ci => ci.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<OrderItem>()
+                .HasOne(oi => oi.Order)
+                .WithMany(o => o.OrderItems)
+                .HasForeignKey(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

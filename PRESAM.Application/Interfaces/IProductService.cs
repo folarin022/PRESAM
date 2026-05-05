@@ -1,4 +1,5 @@
 ﻿using PRESAM.Application.DTOs;
+using PRESAM.Domain.Entities;
 
 namespace PRESAM.Application.Interfaces
 {
@@ -11,5 +12,6 @@ namespace PRESAM.Application.Interfaces
         Task DeleteProductAsync(Guid id);
         Task<IEnumerable<ProductDto>> GetProductsByCategoryAsync(Guid categoryId);
         Task<IEnumerable<ProductDto>> SearchProductsAsync(string searchTerm);
+        Task<Result> DeleteAsync(Guid id);
     }
 }

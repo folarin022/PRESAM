@@ -10,5 +10,8 @@ namespace PRESAM.Domain.Interfaces
         Task<IEnumerable<Product>> GetProductsByCategoryAsync(Guid categoryId);
         Task<IEnumerable<Product>> SearchProductsAsync(string searchTerm);
         Task<IEnumerable<Product>> GetActiveProductsAsync();
+        Task<Product> GetByIdWithRelationsAsync(Guid id);
+        Task<bool> HasOrderItemsAsync(Guid productId);
+        Task<bool> HasCartItemsAsync(Guid productId);
     }
 }

@@ -215,6 +215,30 @@ namespace PRESAM.Web.Controllers
             return Ok("Code resent successfully");
         }
 
+        public async Task<IActionResult> ForgotPassword(string email,string password)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return BadRequest("Email is required");
+            }
+            if (string.IsNullOrEmpty(password))
+            {
+                return BadRequest("Email is required");
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return NotFound("Email not found");
+            }
+
+            if (user.EmailConfirmed)
+            {
+                return RedirectToAction("Account" , "RegisterConfirmation");
+            }
+            return Ok("Link sent successfully");
+        }
+
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
