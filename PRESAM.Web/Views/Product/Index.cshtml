@@ -72,9 +72,13 @@ else
         <div class="filters-bar" id="products">
             <div class="filter-group">
                 <button class="filter-btn active" onclick="filterProducts('all', event)">All</button>
-                <button class="filter-btn" onclick="filterProducts('electronics', event)">Electronics</button>
-                <button class="filter-btn" onclick="filterProducts('fashion', event)">Fashion</button>
-                <button class="filter-btn" onclick="filterProducts('books', event)">Books</button>
+                @if (categories != null)
+                {
+                    foreach (var cat in categories)
+                    {
+                        <button class="filter-btn" onclick="filterProducts('@cat.Name.ToLower()', event)">@cat.Name</button>
+                    }
+                }
             </div>
             <div class="sort-group">
                 <select id="sortSelect" onchange="sortProducts()" class="sort-select">
@@ -98,7 +102,31 @@ else
                         @(product.StockQuantity > 0 ? "In Stock" : "Sold Out")
                     </div>
                     <div class="product-image">
-                        <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)" alt="@product.Name">
+                        <div class="image-slider" data-product="@product.Id">
+                            <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)" alt="@product.Name" class="slide active">
+                            @if (!string.IsNullOrEmpty(product.ImageUrl2))
+                            {
+                                <img src="@product.ImageUrl2" alt="@product.Name" class="slide">
+                            }
+                            @if (!string.IsNullOrEmpty(product.ImageUrl3))
+                            {
+                                <img src="@product.ImageUrl3" alt="@product.Name" class="slide">
+                            }
+                        </div>
+                        @if (!string.IsNullOrEmpty(product.ImageUrl2) || !string.IsNullOrEmpty(product.ImageUrl3))
+                        {
+                            <div class="slide-dots">
+                                <span class="dot active" onclick="changeSlide(this, 0)"></span>
+                                @if (!string.IsNullOrEmpty(product.ImageUrl2))
+                                {
+                                    <span class="dot" onclick="changeSlide(this, 1)"></span>
+                                }
+                                @if (!string.IsNullOrEmpty(product.ImageUrl3))
+                                {
+                                    <span class="dot" onclick="changeSlide(this, 2)"></span>
+                                }
+                            </div>
+                        }
                         <div class="product-actions-overlay">
                             <button onclick="quickView('@product.Id')" class="quick-view-btn">
                                 <i class="fas fa-eye"></i>
@@ -275,6 +303,47 @@ else
         color: var(--text-secondary);
         transition: 0.2s;
     }
+    /* Image Slider */
+.image-slider {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.slide.active {
+    opacity: 1;
+}
+.slide-dots {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    z-index: 3;
+}
+.slide-dots .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: 0.2s;
+}
+.slide-dots .dot.active {
+    background: white;
+    width: 16px;
+    border-radius: 3px;
+}
     .filter-btn:hover { color: var(--accent); }
     .filter-btn.active {
         background: #3498db !important;
@@ -541,6 +610,46 @@ else
         }
         products.forEach(p => grid.appendChild(p));
     }
+
+    function changeSlide(dot, index) {
+    const slider = dot.closest('.product-image').querySelector('.image-slider');
+    const slides = slider.querySelectorAll('.slide');
+    const dots = dot.parentElement.querySelectorAll('.dot');
+    
+    slides.forEach(s => s.classList.remove('active'));
+    dots.forEach(d => d.classList.remove('active'));
+    
+    slides[index].classList.add('active');
+    dots[index].classList.add('active');
+}
+
+// Auto-rotate slides on hover
+document.querySelectorAll('.product-card').forEach(card => {
+    let interval;
+    card.addEventListener('mouseenter', () => {
+        const slides = card.querySelectorAll('.slide');
+        const dots = card.querySelectorAll('.dot');
+        if (slides.length > 1) {
+            let current = 0;
+            interval = setInterval(() => {
+                current = (current + 1) % slides.length;
+                slides.forEach(s => s.classList.remove('active'));
+                dots.forEach(d => d.classList.remove('active'));
+                slides[current].classList.add('active');
+                dots[current].classList.add('active');
+            }, 2000);
+        }
+    });
+    card.addEventListener('mouseleave', () => {
+        clearInterval(interval);
+        const slides = card.querySelectorAll('.slide');
+        const dots = card.querySelectorAll('.dot');
+        slides.forEach(s => s.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
+        if (slides.length > 0) slides[0].classList.add('active');
+        if (dots.length > 0) dots[0].classList.add('active');
+    });
+});
 
     function addToCart(productId) {
         fetch('/Cart/AddToCart', {

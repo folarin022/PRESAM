@@ -40,18 +40,57 @@
             </div>
             
             <!-- Image Upload Field -->
+            <!-- Image 1 -->
             <div class="form-group">
-                <label>Product Image</label>
-                <div class="image-upload-area" id="imageUploadArea">
-                    <label for="productImage" class="upload-label">
+                <label>Product Image 1 *</label>
+                <div class="image-upload-area" id="imageUploadArea1">
+                    <label for="productImage1" class="upload-label">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p>Click to upload product image</p>
                         <span>PNG, JPG, JPEG up to 5MB</span>
                     </label>
-                    <input type="file" asp-for="ProductImage" accept="image/*" id="productImage" style="display: none;" />
-                    <div class="image-preview" id="imagePreview" style="display: none;">
-                        <img id="previewImg" src="#" alt="Preview" />
-                        <button type="button" class="remove-image" onclick="removeImage()">
+                    <input type="file" name="ProductImage" accept="image/*" id="productImage1" style="display: none;" onchange="previewImage(1)" />
+                    <div class="image-preview" id="imagePreview1" style="display: none;">
+                        <img id="previewImg1" src="#" alt="Preview" />
+                        <button type="button" class="remove-image" onclick="removeImage(1)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image 2 -->
+            <div class="form-group">
+                <label>Product Image 2 (Optional)</label>
+                <div class="image-upload-area" id="imageUploadArea2">
+                    <label for="productImage2" class="upload-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload product image</p>
+                        <span>PNG, JPG, JPEG up to 5MB</span>
+                    </label>
+                    <input type="file" name="ProductImage2" accept="image/*" id="productImage2" style="display: none;" onchange="previewImage(2)" />
+                    <div class="image-preview" id="imagePreview2" style="display: none;">
+                        <img id="previewImg2" src="#" alt="Preview" />
+                        <button type="button" class="remove-image" onclick="removeImage(2)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image 3 -->
+            <div class="form-group">
+                <label>Product Image 3 (Optional)</label>
+                <div class="image-upload-area" id="imageUploadArea3">
+                    <label for="productImage3" class="upload-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload product image</p>
+                        <span>PNG, JPG, JPEG up to 5MB</span>
+                    </label>
+                    <input type="file" name="ProductImage3" accept="image/*" id="productImage3" style="display: none;" onchange="previewImage(3)" />
+                    <div class="image-preview" id="imagePreview3" style="display: none;">
+                        <img id="previewImg3" src="#" alt="Preview" />
+                        <button type="button" class="remove-image" onclick="removeImage(3)">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -299,37 +338,30 @@
 
 <script>
     // Image preview
-    document.getElementById('productImage').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            // Validate file type
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-            if (!allowedTypes.includes(file.type)) {
-                alert('Please upload only JPG, JPEG or PNG files');
-                this.value = '';
-                return;
-            }
-            
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert('File size must be less than 5MB');
-                this.value = '';
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                document.getElementById('previewImg').src = event.target.result;
-                document.querySelector('.upload-label').style.display = 'none';
-                document.getElementById('imagePreview').style.display = 'flex';
-            }
-            reader.readAsDataURL(file);
-        }
-    });
+        function previewImage(num) {
+        const input = document.getElementById('productImage' + num);
+        const preview = document.getElementById('imagePreview' + num);
+        const previewImg = document.getElementById('previewImg' + num);
+        const uploadLabel = document.querySelector('#imageUploadArea' + num + ' .upload-label');
 
-    function removeImage() {
-        document.getElementById('productImage').value = '';
-        document.querySelector('.upload-label').style.display = 'block';
-        document.getElementById('imagePreview').style.display = 'none';
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                preview.style.display = 'block';
+                uploadLabel.style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function removeImage(num) {
+        const input = document.getElementById('productImage' + num);
+        const preview = document.getElementById('imagePreview' + num);
+        const uploadLabel = document.querySelector('#imageUploadArea' + num + ' .upload-label');
+
+        input.value = '';
+        preview.style.display = 'none';
+        uploadLabel.style.display = 'block';
     }
 </script>

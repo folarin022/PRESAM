@@ -4,52 +4,249 @@
     ViewData["Title"] = "Manage Users";
 }
 
-<div class="container">
-    <h2 style="margin-bottom: 30px;">Manage Users</h2>
-    
-    <div class="premium-card">
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="border-bottom: 1px solid var(--border);">
-                        <th style="padding: 12px; text-align: left;">Name</th>
-                        <th style="padding: 12px; text-align: left;">Email</th>
-                        <th style="padding: 12px; text-align: left;">Phone</th>
-                        <th style="padding: 12px; text-align: left;">Role</th>
-                        <th style="padding: 12px; text-align: left;">Actions</th>
-                    </tr>
-                </thead>
-            </table>
+<div class="users-container">
+    <!-- Header -->
+    <div class="users-header">
+        <div>
+            <h2>Manage Users</h2>
+            <p class="users-count">@(Model?.Count() ?? 0) total users</p>
         </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="users-card">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-wrapper">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Registered</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="user-avatar-small">
+                                            @user.FirstName[0]@user.LastName[0]
+                                        </div>
+                                        <div class="user-name-cell">
+                                            <span class="user-fullname">@user.FirstName @user.LastName</span>
+                                            <span class="user-role-cell @(user.Email == "admin@presam.com" ? "role-admin" : "role-customer")">
+                                                @(user.Email == "admin@presam.com" ? "Admin" : "Customer")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@user.Email</td>
+                                <td>@(string.IsNullOrEmpty(user.PhoneNumber) ? "—" : user.PhoneNumber)</td>
+                                <td>@user.RegistrationDate.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="/Admin/UserDetails/@user.Id" class="btn-action-sm" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        @if (user.Email != "admin@presam.com")
+                                        {
+                                            <button class="btn-action-sm btn-delete" data-userid="@user.Id" title="Delete User">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-users-slash"></i>
+                <h3>No users found</h3>
+                <p>Users will appear here when they register.</p>
+            </div>
+        }
     </div>
 </div>
 
-<script>
-    document.querySelectorAll('.role-select').forEach(select => {
-        select.addEventListener('change', function() {
-            const userId = this.dataset.userid;
-            const newRole = this.value;
-            
-            fetch('/Admin/UpdateUserRole', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: userId, role: newRole })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Role updated successfully');
-                } else {
-                    alert('Error updating role');
-                }
-            });
-        });
-    });
+<style>
+    .users-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 30px;
+    }
 
+    .users-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    .users-header h2 {
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: var(--text-primary);
+    }
+    .users-count {
+        font-size: 14px;
+        color: var(--text-secondary);
+    }
+
+    .users-card {
+        background: var(--bg-card);
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .users-table th {
+        padding: 14px 20px;
+        text-align: left;
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: var(--bg-primary);
+        border-bottom: 1px solid var(--border);
+    }
+    .users-table td {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--border);
+        font-size: 14px;
+        color: var(--text-primary);
+    }
+    .users-table tbody tr:hover td {
+        background: var(--bg-primary);
+    }
+    .users-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .user-avatar-small {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: var(--accent);
+        color: black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+    .user-name-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .user-fullname {
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .user-role-cell {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        width: fit-content;
+    }
+    .role-admin {
+        background: var(--accent);
+        color: black;
+    }
+    .role-customer {
+        background: var(--bg-primary);
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    .btn-action-sm {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg-primary);
+        color: var(--text-secondary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        text-decoration: none;
+        font-size: 13px;
+    }
+    .btn-action-sm:hover {
+        background: var(--accent);
+        color: black;
+        border-color: var(--accent);
+    }
+    .btn-delete:hover {
+        background: #e74c3c;
+        border-color: #e74c3c;
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-secondary);
+    }
+    .empty-state i {
+        font-size: 50px;
+        margin-bottom: 15px;
+        opacity: 0.4;
+    }
+    .empty-state h3 {
+        font-size: 18px;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+    }
+
+    @@media (max-width: 768px) {
+        .users-container { padding: 20px; }
+        .users-table th, .users-table td { padding: 10px 14px; font-size: 12px; }
+        .user-avatar-small { width: 32px; height: 32px; font-size: 12px; }
+    }
+</style>
+
+<script>
     document.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', function() {
             const userId = this.dataset.userid;
-            if (confirm('Delete this user?')) {
+            if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
                 fetch('/Admin/DeleteUser', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -60,8 +257,11 @@
                     if (data.success) {
                         location.reload();
                     } else {
-                        alert(data.message);
+                        alert(data.message || 'Failed to delete user');
                     }
+                })
+                .catch(error => {
+                    alert('Error: ' + error);
                 });
             }
         });

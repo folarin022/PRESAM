@@ -56,6 +56,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

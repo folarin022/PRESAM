@@ -8,20 +8,27 @@
 <div class="product-detail-container">
     <div class="product-grid">
         <!-- Left Column - Product Image Gallery -->
+        <!-- Left Column - Product Image Gallery -->
         <div class="product-gallery">
             <div class="main-image">
-                <img src="@Model.ImageUrl" alt="@Model.Name" id="mainProductImage" />
+                <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/placeholder.jpg" : Model.ImageUrl)" alt="@Model.Name" id="mainProductImage" />
             </div>
             <div class="thumbnail-list">
-                <div class="thumbnail active" onclick="changeImage('@Model.ImageUrl')">
-                    <img src="@Model.ImageUrl" alt="Thumbnail" />
+                <div class="thumbnail active" onclick="changeImage('@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/placeholder.jpg" : Model.ImageUrl)')">
+                    <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/placeholder.jpg" : Model.ImageUrl)" alt="Thumbnail 1" />
                 </div>
-                <div class="thumbnail" onclick="changeImage('@Model.ImageUrl')">
-                    <img src="@Model.ImageUrl" alt="Thumbnail" />
-                </div>
-                <div class="thumbnail" onclick="changeImage('@Model.ImageUrl')">
-                    <img src="@Model.ImageUrl" alt="Thumbnail" />
-                </div>
+                @if (!string.IsNullOrEmpty(Model.ImageUrl2))
+                {
+                    <div class="thumbnail" onclick="changeImage('@Model.ImageUrl2')">
+                        <img src="@Model.ImageUrl2" alt="Thumbnail 2" />
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.ImageUrl3))
+                {
+                    <div class="thumbnail" onclick="changeImage('@Model.ImageUrl3')">
+                        <img src="@Model.ImageUrl3" alt="Thumbnail 3" />
+                    </div>
+                }
             </div>
         </div>
 

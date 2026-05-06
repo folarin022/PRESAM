@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace PRESAM.Application.DTOs
 {
@@ -13,11 +11,15 @@ namespace PRESAM.Application.DTOs
         public decimal Price { get; set; }
         public int StockQuantity { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
+        public string? ImageUrl2 { get; set; }
+        public string? ImageUrl3 { get; set; }
+        public IFormFile? ProductImage { get; set; }
+        public IFormFile? ProductImage2 { get; set; }
+        public IFormFile? ProductImage3 { get; set; }
         public Guid CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public bool IsActive { get; set; }
-        public IFormFile? ProductImage { get; set; }
     }
 
     public class CreateProductDto
@@ -28,6 +30,7 @@ namespace PRESAM.Application.DTOs
         public int StockQuantity { get; set; }
         public Guid CategoryId { get; set; }
         public IFormFile? ProductImage { get; set; }
+        public IFormFile? ProductImage2 { get; set; }
+        public IFormFile? ProductImage3 { get; set; }
     }
 }
-

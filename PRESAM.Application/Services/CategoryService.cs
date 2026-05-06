@@ -23,7 +23,6 @@ namespace PRESAM.Application.Services
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
-                ImageUrl = c.ImageUrl,
                 IsActive = c.IsActive,
                 ProductCount = c.Products?.Count ?? 0,
                 CreatedAt = c.CreatedAt
@@ -40,7 +39,6 @@ namespace PRESAM.Application.Services
                 Id = category.Id,
                 Name = category.Name,
                 Description = category.Description,
-                ImageUrl = category.ImageUrl,
                 IsActive = category.IsActive,
                 ProductCount = category.Products?.Count ?? 0,
                 CreatedAt = category.CreatedAt
@@ -53,7 +51,7 @@ namespace PRESAM.Application.Services
             {
                 Name = categoryDto.Name,
                 Description = categoryDto.Description,
-                ImageUrl = categoryDto.ImageUrl ?? "/images/categories/default.jpg",
+                ImageUrl = "/images/categories/default.jpg",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };
@@ -65,7 +63,6 @@ namespace PRESAM.Application.Services
                 Id = created.Id,
                 Name = created.Name,
                 Description = created.Description,
-                ImageUrl = created.ImageUrl,
                 IsActive = created.IsActive,
                 ProductCount = 0,
                 CreatedAt = created.CreatedAt
@@ -83,7 +80,6 @@ namespace PRESAM.Application.Services
             // Manual mapping of updated values
             existing.Name = categoryDto.Name;
             existing.Description = categoryDto.Description;
-            existing.ImageUrl = categoryDto.ImageUrl;
             existing.IsActive = categoryDto.IsActive;
             existing.UpdatedAt = DateTime.UtcNow;
 

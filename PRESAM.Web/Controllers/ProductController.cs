@@ -20,6 +20,7 @@ namespace PRESAM.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var products = await _productService.GetAllProductsAsync();
+            ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
             return View(products);
         }
 
@@ -38,6 +39,7 @@ namespace PRESAM.Web.Controllers
             var products = await _productService.GetProductsByCategoryAsync(categoryId);
             var category = await _categoryService.GetCategoryByIdAsync(categoryId);
             ViewBag.CategoryName = category?.Name ?? "Products";
+            ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
             return View(products);
         }
 
@@ -49,6 +51,7 @@ namespace PRESAM.Web.Controllers
             }
             var products = await _productService.SearchProductsAsync(searchTerm);
             ViewBag.SearchTerm = searchTerm;
+            ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
             return View(products);
         }
 
