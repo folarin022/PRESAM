@@ -36,24 +36,79 @@ namespace PRESAM.Application.Services
 
         public async Task<ProductDto> GetProductByIdAsync(Guid id)
         {
-            var product = await _productRepository.GetByIdWithRelationsAsync(id) ?? await _productRepository.GetByIdAsync(id);
+            var product = await _productRepository.GetByIdWithRelationsAsync(id)
+                ?? await _productRepository.GetByIdAsync(id);
             return product == null ? null : MapToDto(product);
         }
 
         public async Task<ProductDto> CreateProductAsync(CreateProductDto productDto)
         {
-            string imageUrl = "/images/placeholder.jpg";
+            _logger.LogInformation("🔍 Starting product creation for: {ProductName}", productDto.Name);
+
+            string imageUrl = "/images/products/placeholder.jpg";
             string? imageUrl2 = null;
             string? imageUrl3 = null;
 
-            if (productDto.ProductImage != null && productDto.ProductImage.Length > 0)
-                imageUrl = await _cloudinaryService.UploadImageAsync(productDto.ProductImage) ?? "/images/placeholder.jpg";
+            if (productDto.ProductImage == null || productDto.ProductImage.Length == 0)
+            {
+                _logger.LogWarning("⚠️ No primary image provided, using placeholder");
+            }
+            else
+            {
+                _logger.LogInformation("📤 Uploading primary image: {FileName}, Size: {Size} bytes",
+                    productDto.ProductImage.FileName, productDto.ProductImage.Length);
+
+                try
+                {
+                    var uploadedUrl = await _cloudinaryService.UploadImageAsync(productDto.ProductImage);
+
+                    if (!string.IsNullOrEmpty(uploadedUrl))
+                    {
+                        imageUrl = uploadedUrl;
+                        _logger.LogInformation("✅ Primary image uploaded successfully: {Url}", imageUrl);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("⚠️ Cloudinary returned null/empty URL for primary image, using placeholder");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "❌ Primary image upload failed. Using placeholder");
+                }
+            }
 
             if (productDto.ProductImage2 != null && productDto.ProductImage2.Length > 0)
-                imageUrl2 = await _cloudinaryService.UploadImageAsync(productDto.ProductImage2);
+            {
+                _logger.LogInformation("📤 Uploading secondary image: {FileName}, Size: {Size} bytes",
+                    productDto.ProductImage2.FileName, productDto.ProductImage2.Length);
+
+                try
+                {
+                    imageUrl2 = await _cloudinaryService.UploadImageAsync(productDto.ProductImage2);
+                    _logger.LogInformation("✅ Secondary image uploaded: {Url}", imageUrl2);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "❌ Secondary image upload failed");
+                }
+            }
 
             if (productDto.ProductImage3 != null && productDto.ProductImage3.Length > 0)
-                imageUrl3 = await _cloudinaryService.UploadImageAsync(productDto.ProductImage3);
+            {
+                _logger.LogInformation("📤 Uploading tertiary image: {FileName}, Size: {Size} bytes",
+                    productDto.ProductImage3.FileName, productDto.ProductImage3.Length);
+
+                try
+                {
+                    imageUrl3 = await _cloudinaryService.UploadImageAsync(productDto.ProductImage3);
+                    _logger.LogInformation("✅ Tertiary image uploaded: {Url}", imageUrl3);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "❌ Tertiary image upload failed");
+                }
+            }
 
             var product = new Product
             {
@@ -70,7 +125,12 @@ namespace PRESAM.Application.Services
                 IsActive = true
             };
 
+            _logger.LogInformation("💾 Saving product to database. ImageUrl: {ImageUrl}", product.ImageUrl);
+
             var created = await _productRepository.AddAsync(product);
+
+            _logger.LogInformation("🎉 Product created successfully with ID: {ProductId}", created.Id);
+
             return MapToDto(created);
         }
 
@@ -88,17 +148,15 @@ namespace PRESAM.Application.Services
             existing.IsActive = productDto.IsActive;
             existing.UpdatedAt = DateTime.UtcNow;
 
-            // Update Image 1 - use ProductImage (IFormFile)
             if (productDto.ProductImage != null && productDto.ProductImage.Length > 0)
             {
-                if (!string.IsNullOrEmpty(existing.ImageUrl) && existing.ImageUrl != "/images/placeholder.jpg")
+                if (!string.IsNullOrEmpty(existing.ImageUrl) && existing.ImageUrl != "/images/products/placeholder.jpg")
                     _ = _cloudinaryService.DeleteImageAsync(existing.ImageUrl);
                 var newUrl = await _cloudinaryService.UploadImageAsync(productDto.ProductImage);
                 if (!string.IsNullOrEmpty(newUrl))
                     existing.ImageUrl = newUrl;
             }
 
-            // Update Image 2 - use ProductImage2 (IFormFile)
             if (productDto.ProductImage2 != null && productDto.ProductImage2.Length > 0)
             {
                 if (!string.IsNullOrEmpty(existing.ImageUrl2))
@@ -108,7 +166,6 @@ namespace PRESAM.Application.Services
                     existing.ImageUrl2 = newUrl;
             }
 
-            // Update Image 3 - use ProductImage3 (IFormFile)
             if (productDto.ProductImage3 != null && productDto.ProductImage3.Length > 0)
             {
                 if (!string.IsNullOrEmpty(existing.ImageUrl3))
@@ -123,7 +180,9 @@ namespace PRESAM.Application.Services
 
         public async Task DeleteProductAsync(Guid id)
         {
-            var product = await _productRepository.GetByIdWithRelationsAsync(id) ?? await _productRepository.GetByIdAsync(id);
+            var product = await _productRepository.GetByIdWithRelationsAsync(id)
+                ?? await _productRepository.GetByIdAsync(id);
+
             if (product == null)
                 throw new KeyNotFoundException($"Product with id {id} not found.");
 
@@ -144,10 +203,9 @@ namespace PRESAM.Application.Services
                 return;
             }
 
-            // Delete images from Cloudinary
             try
             {
-                if (!string.IsNullOrEmpty(product.ImageUrl) && product.ImageUrl != "/images/placeholder.jpg" && !product.ImageUrl.Contains("placeholder"))
+                if (!string.IsNullOrEmpty(product.ImageUrl) && product.ImageUrl != "/images/products/placeholder.jpg" && !product.ImageUrl.Contains("placeholder"))
                     _ = _cloudinaryService.DeleteImageAsync(product.ImageUrl);
                 if (!string.IsNullOrEmpty(product.ImageUrl2))
                     _ = _cloudinaryService.DeleteImageAsync(product.ImageUrl2);
@@ -188,17 +246,19 @@ namespace PRESAM.Application.Services
             if (hasOrders)
                 return Result.Failure("Cannot delete product. It has order history.");
 
-            // Delete images from Cloudinary
             try
             {
-                if (!string.IsNullOrEmpty(product.ImageUrl) && product.ImageUrl != "/images/placeholder.jpg" && !product.ImageUrl.Contains("placeholder"))
+                if (!string.IsNullOrEmpty(product.ImageUrl) && product.ImageUrl != "/images/products/placeholder.jpg" && !product.ImageUrl.Contains("placeholder"))
                     _ = _cloudinaryService.DeleteImageAsync(product.ImageUrl);
                 if (!string.IsNullOrEmpty(product.ImageUrl2))
                     _ = _cloudinaryService.DeleteImageAsync(product.ImageUrl2);
                 if (!string.IsNullOrEmpty(product.ImageUrl3))
                     _ = _cloudinaryService.DeleteImageAsync(product.ImageUrl3);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete images from Cloudinary");
+            }
 
             _dbContext.Products.Remove(product);
             await _dbContext.SaveChangesAsync();

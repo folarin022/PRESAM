@@ -58,17 +58,23 @@ namespace PRESAM.Application.Services
 
             var product = await _productRepository.GetByIdAsync(productId);
             if (product == null)
-            {
                 throw new InvalidOperationException("Product not found");
-            }
 
             var existingItem = cart.CartItems?.FirstOrDefault(i => i.ProductId == productId);
+            int currentCartQty = existingItem?.Quantity ?? 0;
+            int totalRequested = currentCartQty + quantity;
+
+            if (product.StockQuantity < totalRequested)
+            {
+                throw new InvalidOperationException(
+                    $"Only {product.StockQuantity - currentCartQty} units available. You already have {currentCartQty} in cart.");
+            }
+
 
             if (existingItem != null)
             {
                 existingItem.Quantity += quantity;
                 existingItem.UpdatedAt = DateTime.UtcNow;
-
                 await _cartRepository.UpdateCartItemAsync(existingItem);
             }
             else
@@ -83,12 +89,12 @@ namespace PRESAM.Application.Services
                 };
 
                 if (cart.CartItems == null)
-                {
                     cart.CartItems = new List<CartItem>();
-                }
+
                 cart.CartItems.Add(cartItem);
                 await _cartRepository.UpdateAsync(cart);
             }
+
         }
 
         public async Task UpdateCartItemAsync(string userId, Guid cartItemId, int quantity)
@@ -97,18 +103,27 @@ namespace PRESAM.Application.Services
             if (cart == null) return;
 
             var cartItem = cart.CartItems?.FirstOrDefault(i => i.Id == cartItemId);
-            if (cartItem != null)
+            if (cartItem == null) return;
+
+            if (quantity <= 0)
             {
-                if (quantity <= 0)
+                await RemoveFromCartAsync(userId, cartItemId);
+            }
+            else
+            {
+                var product = await _productRepository.GetByIdAsync(cartItem.ProductId);
+                if (product != null)
                 {
-                    await RemoveFromCartAsync(userId, cartItemId);
+                    int difference = quantity - cartItem.Quantity;
+
+                    if (difference > 0 && product.StockQuantity < difference)
+                        throw new InvalidOperationException($"Only {product.StockQuantity} additional units available.");
+
                 }
-                else
-                {
-                    cartItem.Quantity = quantity;
-                    cartItem.UpdatedAt = DateTime.UtcNow;
-                    await _cartRepository.UpdateAsync(cart);  
-                }
+
+                cartItem.Quantity = quantity;
+                cartItem.UpdatedAt = DateTime.UtcNow;
+                await _cartRepository.UpdateCartItemAsync(cartItem);
             }
         }
 
@@ -120,8 +135,9 @@ namespace PRESAM.Application.Services
             var cartItem = cart.CartItems?.FirstOrDefault(i => i.Id == cartItemId);
             if (cartItem != null)
             {
+
                 cart.CartItems.Remove(cartItem);
-                await _cartRepository.UpdateAsync(cart);  
+                await _cartRepository.UpdateAsync(cart);
             }
         }
 

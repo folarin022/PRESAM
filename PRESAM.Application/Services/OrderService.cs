@@ -1,5 +1,4 @@
-﻿// PRESAM.Application/Services/OrderService.cs
-using PRESAM.Application.DTOs;
+﻿using PRESAM.Application.DTOs;
 using PRESAM.Application.Interfaces;
 using PRESAM.Domain.Entities;
 using PRESAM.Domain.Interfaces;
@@ -28,35 +27,6 @@ namespace PRESAM.Application.Services
         private string GenerateOrderNumber()
         {
             return $"PRESAM-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
-        }
-
-        private PaymentPlan GetPaymentPlanEnum(string planType)
-        {
-            return planType switch
-            {
-                "FullPayment" => PaymentPlan.FullPayment,
-                "Weekly4" => PaymentPlan.Weekly4,
-                "Weekly8" => PaymentPlan.Weekly8,
-                "Weekly12" => PaymentPlan.Weekly12,
-                "Monthly3" => PaymentPlan.Monthly3,
-                "Monthly6" => PaymentPlan.Monthly6,
-                "Monthly12" => PaymentPlan.Monthly12,
-                _ => PaymentPlan.FullPayment
-            };
-        }
-
-        private int GetInstallmentCount(string planType)
-        {
-            return planType switch
-            {
-                "Weekly4" => 4,
-                "Weekly8" => 8,
-                "Weekly12" => 12,
-                "Monthly3" => 3,
-                "Monthly6" => 6,
-                "Monthly12" => 12,
-                _ => 1
-            };
         }
 
         private OrderDto MapToOrderDto(Order order)
@@ -90,6 +60,26 @@ namespace PRESAM.Application.Services
                 throw new InvalidOperationException("Cart is empty. Cannot create order.");
             }
 
+            var stockValidation = new List<string>();
+            foreach (var cartItem in cart.CartItems)
+            {
+                var product = await _productRepository.GetByIdAsync(cartItem.ProductId);
+                if (product == null)
+                {
+                    throw new InvalidOperationException($"Product not found: {cartItem.ProductId}");
+                }
+
+                if (product.StockQuantity < cartItem.Quantity)
+                {
+                    stockValidation.Add($"{product.Name}: Only {product.StockQuantity} available, but you requested {cartItem.Quantity}");
+                }
+            }
+
+            if (stockValidation.Any())
+            {
+                throw new InvalidOperationException($"Insufficient stock: {string.Join(", ", stockValidation)}");
+            }
+
             var totalAmount = cart.CartItems.Sum(item => item.Quantity * (item.Product?.Price ?? 0));
             var orderNumber = GenerateOrderNumber();
 
@@ -109,13 +99,8 @@ namespace PRESAM.Application.Services
 
             foreach (var cartItem in cart.CartItems)
             {
-                var product = cartItem.Product;
+                var product = await _productRepository.GetByIdAsync(cartItem.ProductId);
                 if (product == null) continue;
-
-                if (product.StockQuantity < cartItem.Quantity)
-                {
-                    throw new InvalidOperationException($"Insufficient stock for product: {product.Name}");
-                }
 
                 product.StockQuantity -= cartItem.Quantity;
                 await _productRepository.UpdateAsync(product);
@@ -134,6 +119,7 @@ namespace PRESAM.Application.Services
             }
 
             var createdOrder = await _orderRepository.AddAsync(order);
+
             await _cartRepository.ClearCartAsync(cart.Id);
 
             return MapToOrderDto(createdOrder);
@@ -161,6 +147,8 @@ namespace PRESAM.Application.Services
                 throw new KeyNotFoundException($"Order with id {orderId} not found.");
             }
 
+            var oldStatus = order.Status;
+
             order.Status = status switch
             {
                 "Pending" => OrderStatus.Pending,
@@ -170,6 +158,23 @@ namespace PRESAM.Application.Services
                 "Cancelled" => OrderStatus.Cancelled,
                 _ => order.Status
             };
+
+            if (status == "Cancelled" && oldStatus != OrderStatus.Cancelled)
+            {
+                var orderWithItems = await _orderRepository.GetOrderWithItemsAsync(orderId);
+                if (orderWithItems != null && orderWithItems.OrderItems != null)
+                {
+                    foreach (var item in orderWithItems.OrderItems)
+                    {
+                        var product = await _productRepository.GetByIdAsync(item.ProductId);
+                        if (product != null)
+                        {
+                            product.StockQuantity += item.Quantity;
+                            await _productRepository.UpdateAsync(product);
+                        }
+                    }
+                }
+            }
 
             order.UpdatedAt = DateTime.UtcNow;
             await _orderRepository.UpdateAsync(order);

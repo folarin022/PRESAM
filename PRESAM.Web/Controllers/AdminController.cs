@@ -55,15 +55,12 @@ namespace PRESAM.Web.Controllers
         public async Task<IActionResult> UserDetails(string id)
         {
             if (string.IsNullOrEmpty(id))
-            {
                 return BadRequest("User ID is required");
-            }
 
             var user = await _adminService.GetUserByIdAsync(id);
             if (user == null)
-            {
                 return NotFound();
-            }
+
             return View(user);
         }
 
@@ -74,14 +71,10 @@ namespace PRESAM.Web.Controllers
             {
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
-                {
                     return Json(new { success = false, message = "User not found" });
-                }
 
                 if (user.Email == "admin@presam.com")
-                {
                     return Json(new { success = false, message = "Cannot delete the main admin user" });
-                }
 
                 await _userManager.DeleteAsync(user);
                 return Json(new { success = true, message = "User deleted successfully" });
@@ -102,15 +95,12 @@ namespace PRESAM.Web.Controllers
         public async Task<IActionResult> OrderDetails(Guid id)
         {
             if (id == Guid.Empty)
-            {
                 return BadRequest("Invalid order ID");
-            }
 
             var order = await _adminService.GetOrderDetailsAsync(id);
             if (order == null)
-            {
                 return NotFound();
-            }
+
             return View(order);
         }
 
@@ -118,17 +108,13 @@ namespace PRESAM.Web.Controllers
         public async Task<IActionResult> UpdateOrderStatus([FromBody] UpdateOrderRequest request)
         {
             if (request == null || string.IsNullOrEmpty(request.OrderId))
-            {
                 return Json(new { success = false, message = "Invalid request" });
-            }
 
             try
             {
                 var order = await _orderRepository.GetByIdAsync(Guid.Parse(request.OrderId));
                 if (order == null)
-                {
                     return Json(new { success = false, message = "Order not found" });
-                }
 
                 var oldStatus = order.Status.ToString();
                 order.Status = request.Status switch
@@ -142,9 +128,7 @@ namespace PRESAM.Web.Controllers
                 };
 
                 if (oldStatus == order.Status.ToString())
-                {
                     return Json(new { success = false, message = "Status is already " + oldStatus });
-                }
 
                 order.UpdatedAt = DateTime.UtcNow;
                 await _orderRepository.UpdateAsync(order);
@@ -187,7 +171,6 @@ namespace PRESAM.Web.Controllers
 
                 order.UpdatedAt = DateTime.UtcNow;
                 await _orderRepository.UpdateAsync(order);
-
                 TempData["Success"] = "Order status updated successfully";
             }
             catch (Exception ex)
@@ -200,18 +183,13 @@ namespace PRESAM.Web.Controllers
 
         // Category Management
         [HttpGet]
-        public IActionResult CreateCategory()
-        {
-            return View();
-        }
+        public IActionResult CreateCategory() => View();
 
         [HttpPost]
         public async Task<IActionResult> CreateCategory(CategoryDto model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             try
             {
@@ -230,15 +208,11 @@ namespace PRESAM.Web.Controllers
         public async Task<IActionResult> EditCategory(Guid id)
         {
             if (id == Guid.Empty)
-            {
                 return BadRequest("Invalid category ID");
-            }
 
             var category = await _categoryService.GetCategoryByIdAsync(id);
             if (category == null)
-            {
                 return NotFound();
-            }
 
             return View(category);
         }
@@ -247,9 +221,7 @@ namespace PRESAM.Web.Controllers
         public async Task<IActionResult> EditCategory(CategoryDto model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             try
             {
@@ -287,10 +259,17 @@ namespace PRESAM.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct(CreateProductDto model)
+        public async Task<IActionResult> CreateProduct([FromForm] CreateProductDto model)
         {
+            // FIX: Show exactly which fields are failing ModelState validation
             if (!ModelState.IsValid)
             {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                TempData["Error"] = "Validation failed: " + string.Join(" | ", errors);
                 ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
                 return View(model);
             }
@@ -304,6 +283,7 @@ namespace PRESAM.Web.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", ex.Message);
+                TempData["Error"] = ex.Message;
                 ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
                 return View(model);
             }
@@ -313,25 +293,28 @@ namespace PRESAM.Web.Controllers
         public async Task<IActionResult> EditProduct(Guid id)
         {
             if (id == Guid.Empty)
-            {
                 return BadRequest("Invalid product ID");
-            }
 
             var product = await _productService.GetProductByIdAsync(id);
             if (product == null)
-            {
                 return NotFound();
-            }
 
             ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
             return View(product);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditProduct(ProductDto model)
+        public async Task<IActionResult> EditProduct([FromForm] ProductDto model)
         {
+            // FIX: Show exactly which fields are failing ModelState validation
             if (!ModelState.IsValid)
             {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                TempData["Error"] = "Validation failed: " + string.Join(" | ", errors);
                 ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
                 return View(model);
             }
@@ -345,6 +328,7 @@ namespace PRESAM.Web.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", ex.Message);
+                TempData["Error"] = ex.Message;
                 ViewBag.Categories = await _categoryService.GetAllCategoriesAsync();
                 return View(model);
             }
@@ -357,7 +341,6 @@ namespace PRESAM.Web.Controllers
             return Json(new { success = true, message = "Product deleted successfully" });
         }
 
-        // Helper method to get all categories for dropdowns
         [HttpGet]
         public async Task<IActionResult> GetAllCategories()
         {

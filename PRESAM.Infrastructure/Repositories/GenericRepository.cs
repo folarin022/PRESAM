@@ -1,5 +1,4 @@
-﻿// Infrastructure/Repositories/GenericRepository.cs
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PRESAM.Domain.Interfaces;
 using PRESAM.Infrastructure.Context;
 

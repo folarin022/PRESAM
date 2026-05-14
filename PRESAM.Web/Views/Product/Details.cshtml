@@ -7,16 +7,25 @@
 
 <div class="product-detail-container">
     <div class="product-grid">
-        <!-- Left Column - Product Image Gallery -->
-        <!-- Left Column - Product Image Gallery -->
         <div class="product-gallery">
             <div class="main-image">
-                <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/placeholder.jpg" : Model.ImageUrl)" alt="@Model.Name" id="mainProductImage" />
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.Name" id="mainProductImage" />
+                }
+                else
+                {
+                    <img src="/images/products/placeholder.jpg" alt="No image available" id="mainProductImage" />
+                }
             </div>
+
             <div class="thumbnail-list">
-                <div class="thumbnail active" onclick="changeImage('@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/placeholder.jpg" : Model.ImageUrl)')">
-                    <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/placeholder.jpg" : Model.ImageUrl)" alt="Thumbnail 1" />
-                </div>
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="thumbnail active" onclick="changeImage('@Model.ImageUrl')">
+                        <img src="@Model.ImageUrl" alt="Thumbnail 1" />
+                    </div>
+                }
                 @if (!string.IsNullOrEmpty(Model.ImageUrl2))
                 {
                     <div class="thumbnail" onclick="changeImage('@Model.ImageUrl2')">
@@ -62,7 +71,7 @@
 
             <!-- Stock Status -->
             <div class="stock-status @(Model.StockQuantity > 0 ? "in-stock" : "out-of-stock")">
-                <i class="fas @(Model.StockQuantity > 0 ? "fa-check-circle" : "fa-times-circle")"></i>
+                <i class="fas @(Model.StockQuantity  > 0 ? "fa-check-circle" : "fa-times-circle")"></i>
                 @if (Model.StockQuantity > 0)
                 {
                     <span>In Stock • @Model.StockQuantity units available</span>
@@ -131,37 +140,6 @@
                         <span>100% secure payment methods</span>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Related Products Section -->
-    <div class="related-products">
-        <h2 class="section-title">You May Also Like</h2>
-        <div class="related-grid">
-            <div class="related-card">
-                <img src="https://via.placeholder.com/200" alt="Related product">
-                <h4>Related Product 1</h4>
-                <p>₦5,000</p>
-                <button class="btn-view">View</button>
-            </div>
-            <div class="related-card">
-                <img src="https://via.placeholder.com/200" alt="Related product">
-                <h4>Related Product 2</h4>
-                <p>₦7,500</p>
-                <button class="btn-view">View</button>
-            </div>
-            <div class="related-card">
-                <img src="https://via.placeholder.com/200" alt="Related product">
-                <h4>Related Product 3</h4>
-                <p>₦10,000</p>
-                <button class="btn-view">View</button>
-            </div>
-            <div class="related-card">
-                <img src="https://via.placeholder.com/200" alt="Related product">
-                <h4>Related Product 4</h4>
-                <p>₦3,000</p>
-                <button class="btn-view">View</button>
             </div>
         </div>
     </div>

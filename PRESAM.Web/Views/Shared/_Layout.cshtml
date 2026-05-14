@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> _userManager
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -7,337 +8,360 @@
     <title>@ViewData["Title"] - PRESAM</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-
     <style>
-            :root {
-                --bg-primary: #0a0a0a;
-                --bg-secondary: #111111;
-                --bg-card: #1a1a1a;
-                --text-primary: #ffffff;
-                --text-secondary: #a0a0a0;
-                --accent: #c6a43f;
-                --accent-hover: #d4b856;
-                --border: #2a2a2a;
-                --danger: #e74c3c;
-            }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-            [data-theme="light"] {
-                --bg-primary: #ffffff;
-                --bg-secondary: #f5f7fb;
-                --bg-card: #ffffff;
-                --text-primary: #1a1a2e;
-                --text-secondary: #666666;
-                --accent: #2d6a4f;
-                --accent-hover: #1b4d3e;
-                --border: #e0e0e0;
-            }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
 
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
+        /* Theme Variables */
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #0f0f0f;
+            --bg-card: #141414;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent: #c6a43f;
+            --accent-hover: #d4b856;
+            --border: #222222;
+            --card-bg: #1a1a1a;
+            --input-bg: #1a1a1a;
+        }
 
-            body {
-                font-family: 'Plus Jakarta Sans', sans-serif;
-                background: var(--bg-primary);
-                color: var(--text-primary);
-                transition: all 0.3s ease;
-            }
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #6c757d;
+            --accent: #c6a43f;
+            --accent-hover: #d4b856;
+            --border: #e9ecef;
+            --card-bg: #ffffff;
+            --input-bg: #ffffff;
+        }
 
-            /* Navbar */
-            .navbar {
-                background: var(--bg-secondary);
-                padding: 16px 40px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 1px solid var(--border);
-                position: sticky;
-                top: 0;
-                z-index: 1000;
-                flex-wrap: wrap;
-            }
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
 
-            .logo {
-                font-size: 24px;
-                font-weight: 700;
-                color: var(--text-primary);
-                text-decoration: none;
-                display: flex;
-                align-items: center;
-                gap: 2px;
-            }
+        /* ========== SPLASH SCREEN STYLES (COMPLETE) ========== */
+        .splash-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 10000;
+            background: #050505;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+        }
 
-                .logo span {
-                    color: var(--accent);
-                    font-weight: 800;
-                }
+        .splash-wrapper.hide-splash {
+            opacity: 0;
+            visibility: hidden;
+        }
 
-                .logo i {
-                    font-size: 28px;
-                    color: var(--accent);
-                }
+        .splash-card {
+            text-align: center;
+            padding: 3rem 4rem;
+            background: rgba(8, 8, 8, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 64px;
+            border: 1px solid rgba(198, 164, 63, 0.5);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7);
+            animation: cardGlow 2s infinite alternate;
+        }
 
-            /* Navigation Links with Icons */
-            .nav-links {
-                display: flex;
-                align-items: center;
-                gap: 28px;
-                flex-wrap: wrap;
-            }
+        @@keyframes cardGlow {
+            0% { border-color: rgba(198, 164, 63, 0.3); box-shadow: 0 30px 50px rgba(0,0,0,0.5); }
+            100% { border-color: rgba(198, 164, 63, 0.9); box-shadow: 0 40px 70px rgba(0,0,0,0.8), 0 0 40px rgba(198,164,63,0.2); }
+        }
 
-                .nav-links a {
-                    text-decoration: none;
-                    color: var(--text-secondary);
-                    font-weight: 500;
-                    font-size: 14px;
-                    transition: all 0.2s;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
+        .diamond-icon-container {
+            font-size: 85px;
+            margin-bottom: 1.5rem;
+            animation: diamondPulse 1.8s infinite ease-in-out;
+        }
 
-                    .nav-links a i {
-                        font-size: 16px;
-                        transition: all 0.2s;
-                    }
+        .diamond-icon-container i {
+            background: linear-gradient(135deg, #f9d976, #e9b83a, #c6a43f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-                    .nav-links a:hover {
-                        color: var(--accent);
-                    }
+        @@keyframes diamondPulse {
+            0%, 100% { transform: scale(0.95); opacity: 0.85; }
+            50% { transform: scale(1.08); opacity: 1; }
+        }
 
-                        .nav-links a:hover i {
-                            transform: translateY(-2px);
-                        }
+        .splash-brand {
+            font-size: 62px;
+            font-weight: 800;
+            letter-spacing: 5px;
+            background: linear-gradient(120deg, #ffffff, #f5e2b0, #c6a43f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-            /* User Profile Section */
-            .user-section {
-                display: flex;
-                align-items: center;
-                gap: 20px;
-            }
+        .splash-brand span {
+            background: linear-gradient(135deg, #c6a43f, #ffdd99);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-            .user-profile {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                cursor: pointer;
-                padding: 8px 12px;
-                border-radius: 40px;
-                background: var(--bg-primary);
-                border: 1px solid var(--border);
-                transition: all 0.2s;
-            }
+        .splash-tagline {
+            font-size: 13px;
+            letter-spacing: 4px;
+            color: rgba(198, 164, 63, 0.85);
+            margin: 15px 0 25px;
+            text-transform: uppercase;
+        }
 
-                .user-profile:hover {
-                    border-color: var(--accent);
-                }
+        .loading-text {
+            font-size: 12px;
+            color: #c6a43f;
+            letter-spacing: 2px;
+        }
 
-            .user-avatar {
-                width: 32px;
-                height: 32px;
-                background: var(--accent);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: black;
-                font-weight: bold;
-            }
+        /* ========== NAVBAR ========== */
+        .navbar {
+            background: var(--bg-secondary);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-wrap: wrap;
+            margin: 0;
+            width: 100%;
+        }
 
-            .user-name {
-                font-size: 14px;
-                font-weight: 500;
-                color: var(--text-primary);
-            }
+        .logo {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logo span { color: var(--accent); font-weight: 800; }
+        .logo i { font-size: 28px; color: var(--accent); }
 
-            .user-dropdown {
-                position: relative;
-            }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links a:hover { color: var(--accent); }
 
-            .dropdown-menu {
-                position: absolute;
-                top: 50px;
-                right: 0;
-                background: var(--bg-card);
-                border: 1px solid var(--border);
-                border-radius: 16px;
-                padding: 10px 0;
-                min-width: 200px;
-                display: none;
-                z-index: 1001;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            }
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 40px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        .user-profile:hover { border-color: var(--accent); background: rgba(198,164,63,0.05); }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0a0a0a;
+            font-weight: bold;
+        }
+        .user-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+        .user-dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 10px 0;
+            min-width: 220px;
+            display: none;
+            z-index: 1001;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .dropdown-menu.show { display: block; animation: fadeIn 0.2s ease; }
+        .dropdown-menu a, .dropdown-menu button {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            width: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dropdown-menu a:hover, .dropdown-menu button:hover { background: rgba(198,164,63,0.1); color: var(--accent); }
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-divider { height: 1px; background: var(--border); margin: 8px 0; }
+        .user-email { font-size: 12px; color: var(--text-secondary); padding: 8px 20px; border-bottom: 1px solid var(--border); }
+        .theme-toggle {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .theme-toggle:hover { border-color: var(--accent); }
+        .container { 
+            max-width: 1280px; 
+            margin: 0 auto; 
+            padding: 0 30px;
+            width: 100%;
+        }
+        main { 
+            min-height: calc(100vh - 200px); 
+            padding: 40px 0;
+            width: 100%;
+        }
 
-                .dropdown-menu.show {
-                    display: block;
-                    animation: fadeIn 0.2s ease;
-                }
+        /* ========== FOOTER ========== */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 50px 40px 30px;
+            margin-top: 60px;
+            width: 100%;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+        .footer-section h4 { color: var(--accent); margin-bottom: 16px; font-size: 16px; }
+        .footer-section p, .footer-section a { color: var(--text-secondary); text-decoration: none; line-height: 1.8; font-size: 13px; }
+        .footer-section a:hover { color: var(--accent); }
+        .copyright { text-align: center; padding-top: 40px; margin-top: 40px; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 12px; }
 
-            @@keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(-10px);
-                }
+        .cart-icon { position: relative; }
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -12px;
+            background: var(--accent);
+            color: #000;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
 
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
+        @@media (max-width: 900px) {
+            .navbar { flex-direction: column; gap: 15px; padding: 15px 20px; }
+            .nav-links { justify-content: center; gap: 20px; }
+            .user-section { margin-top: 10px; }
+            .container { padding: 0 20px; }
+            .splash-brand { font-size: 40px; }
+            .splash-card { padding: 2rem 2rem; }
+            .diamond-icon-container { font-size: 55px; }
+        }
 
-            .dropdown-menu a,
-            .dropdown-menu button {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                padding: 12px 20px;
-                text-decoration: none;
-                color: var(--text-secondary);
-                font-size: 14px;
-                width: 100%;
-                border: none;
-                background: none;
-                cursor: pointer;
-                font-family: inherit;
-            }
-
-                .dropdown-menu a:hover,
-                .dropdown-menu button:hover {
-                    background: var(--bg-primary);
-                    color: var(--accent);
-                }
-
-            .dropdown-divider {
-                height: 1px;
-                background: var(--border);
-                margin: 8px 0;
-            }
-
-            .user-email {
-                font-size: 12px;
-                color: var(--text-secondary);
-                padding: 8px 20px;
-                border-bottom: 1px solid var(--border);
-            }
-
-            /* Theme Toggle */
-            .theme-toggle {
-                background: var(--bg-card);
-                border: 1px solid var(--border);
-                border-radius: 40px;
-                padding: 8px 14px;
-                cursor: pointer;
-            }
-
-            /* Main Content */
-            main {
-                min-height: calc(100vh - 200px);
-                padding: 40px 0;
-            }
-
-            /* Container */
-            .container {
-                max-width: 1280px;
-                margin: 0 auto;
-                padding: 0 30px;
-            }
-
-            /* Footer */
-            .footer {
-                background: var(--bg-secondary);
-                padding: 50px 40px 30px;
-                border-top: 1px solid var(--border);
-                margin-top: 60px;
-            }
-
-            .footer-content {
-                max-width: 1200px;
-                margin: 0 auto;
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 40px;
-            }
-
-            .footer-section h4 {
-                color: var(--accent);
-                margin-bottom: 16px;
-                font-size: 16px;
-            }
-
-            .footer-section p,
-            .footer-section a {
-                color: var(--text-secondary);
-                text-decoration: none;
-                line-height: 1.8;
-                font-size: 13px;
-            }
-
-            .copyright {
-                text-align: center;
-                padding-top: 40px;
-                margin-top: 40px;
-                border-top: 1px solid var(--border);
-                color: var(--text-secondary);
-                font-size: 12px;
-            }
-
-            /* Cart Badge */
-            .cart-icon {
-                position: relative;
-            }
-
-            .cart-badge {
-                position: absolute;
-                top: -8px;
-                right: -12px;
-                background: var(--accent);
-                color: black;
-                font-size: 10px;
-                font-weight: 700;
-                padding: 2px 6px;
-                border-radius: 50%;
-            }
-
-            @@media (max-width: 900px) {
-                .navbar {
-                    padding: 15px 20px;
-                    flex-direction: column;
-                    gap: 15px;
-                }
-
-                .nav-links {
-                    justify-content: center;
-                    gap: 20px;
-                }
-
-                .user-section {
-                    margin-top: 10px;
-                }
-            }
+        .main-content-wrapper {
+            opacity: 0;
+            transition: opacity 0.9s ease;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .main-content-wrapper.visible-content { opacity: 1; }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
     </style>
 </head>
-
 <body>
-    @{
-        var user = User.Identity.IsAuthenticated ? await _userManager.GetUserAsync(User) : null;
-        var userName = user != null ? $"{user.FirstName} {user.LastName}" : "";
-        var userInitial = !string.IsNullOrEmpty(userName) ? userName.Substring(0, 1).ToUpper() : "U";
-    }
 
+<!-- SPLASH SCREEN -->
+<div class="splash-wrapper" id="splashScreen">
+    <div class="splash-card">
+        <div class="diamond-icon-container">
+            <i class="fas fa-gem"></i>
+        </div>
+        <div class="splash-brand">PRE<span>SAM</span></div>
+        <div class="splash-tagline">✦ DIAMOND STANDARD ✦</div>
+        <div class="loading-text">
+            <i class="fas fa-spinner fa-pulse"></i> CRAFTING ELEGANCE
+        </div>
+    </div>
+</div>
+
+@{
+    var user = User.Identity.IsAuthenticated ? await _userManager.GetUserAsync(User) : null;
+    var userName = user != null ? $"{user.FirstName} {user.LastName}" : "";
+    var userInitial = !string.IsNullOrEmpty(userName) ? userName.Substring(0, 1).ToUpper() : "U";
+}
+
+<div class="main-content-wrapper" id="mainContent">
+    <!-- NAVBAR -->
     <nav class="navbar">
         <a href="/Home/Index" class="logo">
             <i class="fas fa-gem"></i>PRE<span>SAM</span>
         </a>
 
         <div class="nav-links">
-            <a href="/Home/Index">
-                <i class="fas fa-home"></i> Home
-            </a>
-            <a href="/Product/Index">
-                <i class="fas fa-store"></i> Shop
-            </a>
+            <a href="/Home/Index"><i class="fas fa-home"></i> Home</a>
+            <a href="/Product/Index"><i class="fas fa-store"></i> Shop</a>
 
             @if (User.Identity.IsAuthenticated)
             {
@@ -345,15 +369,11 @@
                     <i class="fas fa-shopping-bag"></i> Cart
                     <span class="cart-badge" id="cartCount" style="display:none;">0</span>
                 </a>
-                <a href="/Order/MyOrders">
-                    <i class="fas fa-list"></i> My Orders
-                </a>
+                <a href="/Order/MyOrders"><i class="fas fa-list"></i> My Orders</a>
 
                 @if (User.IsInRole("Admin"))
                 {
-                    <a href="/Admin/Dashboard">
-                        <i class="fas fa-chart-line"></i> Admin
-                    </a>
+                    <a href="/Admin/Dashboard"><i class="fas fa-chart-line"></i> Admin</a>
                 }
             }
         </div>
@@ -388,7 +408,7 @@
             }
             else
             {
-                <a href="/Account/Login" style="padding: 8px 20px; background: var(--accent); border-radius: 40px; color: black; text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                <a href="/Account/Login" style="padding: 8px 20px; background: var(--accent); border-radius: 40px; color: #fff; text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-sign-in-alt"></i> Sign In
                 </a>
                 <a href="/Account/Register" style="padding: 8px 20px; border: 1px solid var(--accent); border-radius: 40px; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 8px;">
@@ -402,109 +422,142 @@
         </div>
     </nav>
 
+    <!-- MAIN CONTENT -->
     <main>
         <div class="container">
             @RenderBody()
         </div>
     </main>
 
+    <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
                 <h4><i class="fas fa-gem"></i> PRESAM</h4>
-                <p>Premium shopping experience</p>
+                <p>Diamond Standard Elegance</p>
             </div>
-
             <div class="footer-section">
                 <h4>Quick Links</h4>
-                <p><a href="/Home/Index"><i class="fas fa-home"></i> Home</a></p>
-                <p><a href="/Product/Index"><i class="fas fa-store"></i> Shop</a></p>
-                <p><a href="/Cart/Index"><i class="fas fa-shopping-bag"></i> Cart</a></p>
-                <p><a href="/Order/MyOrders"><i class="fas fa-list"></i> Orders</a></p>
+                <p><a href="/Home/Index">Home</a></p>
+                <p><a href="/Product/Index">Shop</a></p>
+                <p><a href="/Cart/Index">Cart</a></p>
+                <p><a href="/Order/MyOrders">Orders</a></p>
             </div>
-
             <div class="footer-section">
                 <h4>Support</h4>
-                <p><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></p>
-                <p><a href="#"><i class="fas fa-envelope"></i> Contact Us</a></p>
-                <p><a href="#"><i class="fas fa-shield-alt"></i> Privacy Policy</a></p>
+                <p><a href="#">FAQ</a></p>
+                <p><a href="#">Contact Us</a></p>
+                <p><a href="#">Privacy Policy</a></p>
             </div>
-
             <div class="footer-section">
                 <h4>Contact</h4>
                 <p><i class="fas fa-envelope"></i> support@presam.com</p>
                 <p><i class="fas fa-phone"></i> +234 123 456 7890</p>
             </div>
         </div>
-
         <div class="copyright">
             <p>&copy; 2025 PRESAM. All rights reserved.</p>
         </div>
     </footer>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        function toggleDropdown() {
-        document.getElementById('userDropdown').classList.toggle('show');
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // SPLASH SCREEN - GUARANTEED TO DISAPPEAR
+    function hideSplashScreen() {
+        var splash = document.getElementById('splashScreen');
+        var mainContent = document.getElementById('mainContent');
+        
+        if (splash) {
+            splash.classList.add('hide-splash');
         }
+        
+        if (mainContent) {
+            mainContent.classList.add('visible-content');
+        }
+    }
+    
+    // Hide splash after 2.5 seconds
+    setTimeout(hideSplashScreen, 2500);
+    
+    // Also hide when page is fully loaded (backup)
+    window.addEventListener('load', function() {
+        setTimeout(hideSplashScreen, 500);
+    });
+    
+    // Emergency fallback - force hide after 4 seconds max
+    setTimeout(function() {
+        var splash = document.getElementById('splashScreen');
+        if (splash && !splash.classList.contains('hide-splash')) {
+            splash.classList.add('hide-splash');
+        }
+        var mainContent = document.getElementById('mainContent');
+        if (mainContent && !mainContent.classList.contains('visible-content')) {
+            mainContent.classList.add('visible-content');
+        }
+    }, 4000);
 
-        function toggleTheme() {
-        const html = document.documentElement;
-        const current = html.getAttribute('data-theme');
-        const newTheme = current === 'light' ? 'dark' : 'light';
+    function toggleDropdown() {
+        var dropdown = document.getElementById('userDropdown');
+        if (dropdown) dropdown.classList.toggle('show');
+    }
+
+    function toggleTheme() {
+        var html = document.documentElement;
+        var current = html.getAttribute('data-theme');
+        var newTheme = current === 'light' ? 'dark' : 'light';
         html.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
-        const icon = document.getElementById('themeIcon');
-
+        var icon = document.getElementById('themeIcon');
         if (newTheme === 'light') {
-        icon.className = 'fas fa-sun';
+            icon.className = 'fas fa-sun';
+        } else {
+            icon.className = 'fas fa-moon';
         }
-        else {
-        icon.className = 'fas fa-moon';
-        }
-        }
+    }
 
-        // Close dropdown when clicking outside
-        window.onclick = function (event) {
+    window.onclick = function(event) {
         if (!event.target.closest('.user-dropdown')) {
-        document.getElementById('userDropdown').classList.remove('show');
+            var dropdown = document.getElementById('userDropdown');
+            if (dropdown) dropdown.classList.remove('show');
         }
-        };
+    };
 
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
+    var savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
-        const icon = document.getElementById('themeIcon');
-
+        var icon = document.getElementById('themeIcon');
         if (savedTheme === 'light') {
-        icon.className = 'fas fa-sun';
+            icon.className = 'fas fa-sun';
+        } else {
+            icon.className = 'fas fa-moon';
         }
-        else {
-        icon.className = 'fas fa-moon';
-        }
-        }
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
 
-        function updateCartCount() {
+    function updateCartCount() {
         @if (User.Identity.IsAuthenticated)
         {
             <text>
-                $.get('/Cart/GetCartCount', function (data) {
-                if (data > 0) {
-                $('#cartCount').text(data).show();
-                }
-                else {
-                $('#cartCount').hide();
-                }
+                $.get('/Cart/GetCartCount', function(data) {
+                    if (data > 0) {
+                        $('#cartCount').text(data).show();
+                    } else {
+                        $('#cartCount').hide();
+                    }
+                }).fail(function() {
+                    console.log('Cart endpoint not available');
                 });
             </text>
         }
-        }
+    }
 
-        $(document).ready(function () {
+    $(document).ready(function() {
         updateCartCount();
-        });
-    </script>
+    });
+</script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,5 +1,4 @@
-﻿// PRESAM.Application/DTOs/OrderDto.cs
-namespace PRESAM.Application.DTOs
+﻿namespace PRESAM.Application.DTOs
 {
     public class CreateOrderDto
     {

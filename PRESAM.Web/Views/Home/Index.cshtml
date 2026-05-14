@@ -57,7 +57,7 @@
                             @(product.StockQuantity > 0 ? "In Stock" : "Sold Out")
                         </div>
                         <div class="product-image">
-                            <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)" alt="@product.Name">
+                            <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/products/placeholder.jpg" : product.ImageUrl)" alt="@product.Name">
                         </div>
                         <div class="product-info">
                             <div class="product-category">@(product.CategoryName ?? "Uncategorized")</div>

@@ -43,6 +43,15 @@ namespace PRESAM.Infrastructure.Repositories
                 .Include(p => p.OrderItems)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
+        public async Task<bool> UpdateStockAsync(Guid productId, int newStockQuantity)
+        {
+            var product = await GetByIdAsync(productId);
+            if (product == null) return false;
+            product.StockQuantity = newStockQuantity;
+            await UpdateAsync(product);
+            return true;
+        }
+
         public async Task<bool> HasOrderItemsAsync(Guid productId)
         { return await _context.OrderItems.AnyAsync(oi => oi.ProductId == productId); }
 
