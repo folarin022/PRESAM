@@ -1,0 +1,545 @@
+﻿@model IEnumerable<PRESAM.Application.DTOs.OrderDto>
+
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="orders-container">
+    <div class="orders-header">
+        <h1 class="page-title">My Orders</h1>
+        <p class="page-subtitle">Track and manage all your purchases</p>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="orders-grid">
+            @foreach (var order in Model)
+            {
+                <div class="order-card @(order.Status.ToLower())">
+                    <div class="order-status-badge">
+                        <span class="status-icon">
+                            @if (order.Status == "Delivered")
+                            {
+                                <i class="fas fa-check-circle"></i>
+                            }
+                            else if (order.Status == "Cancelled")
+                            {
+                                <i class="fas fa-times-circle"></i>
+                            }
+                            else if (order.Status == "Shipped")
+                            {
+                                <i class="fas fa-truck"></i>
+                            }
+                            else if (order.Status == "Processing")
+                            {
+                                <i class="fas fa-cog fa-spin"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-clock"></i>
+                            }
+                        </span>
+                        <span class="status-text status-@order.Status.ToLower()">@order.Status</span>
+                    </div>
+                    
+                    <div class="order-info">
+                        <div class="order-number">
+                            <i class="fas fa-receipt"></i>
+                            <span>@order.OrderNumber</span>
+                        </div>
+                        <div class="order-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>@order.OrderDate.ToString("MMM dd, yyyy")</span>
+                        </div>
+                        <div class="order-total">
+                            <i class="fas fa- naira-sign"></i>
+                            <span>₦@order.TotalAmount.ToString("N0")</span>
+                        </div>
+                    </div>
+                    
+                    <div class="order-items-preview">
+                        @foreach (var item in order.Items.Take(2))
+                        {
+                            <div class="preview-item">
+                                <i class="fas fa-cube"></i>
+                                <span>@item.ProductName x @item.Quantity</span>
+                            </div>
+                        }
+                        @if (order.Items.Count() > 2)
+                        {
+                            <div class="more-items">
+                                +@(order.Items.Count() - 2) more items
+                            </div>
+                        }
+                    </div>
+                    
+                    <div class="order-actions">
+                        <a href="/Order/OrderConfirmation/@order.Id" class="btn-details">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                        @if (order.Status == "Pending" || order.Status == "Processing")
+                        {
+                            <button onclick="cancelOrder('@order.Id')" class="btn-cancel">
+                                <i class="fas fa-ban"></i> Cancel Order
+                            </button>
+                        }
+                        @if (order.Status == "Delivered")
+                        {
+                            <button onclick="writeReview('@order.Id')" class="btn-review">
+                                <i class="fas fa-star"></i> Write Review
+                            </button>
+                        }
+                    </div>
+                    
+                    <div class="order-progress">
+                        <div class="progress-steps">
+                            <div class="step @(GetStepClass(order.Status, "Pending"))">
+                                <div class="step-icon"><i class="fas fa-receipt"></i></div>
+                                <span>Ordered</span>
+                            </div>
+                            <div class="step @(GetStepClass(order.Status, "Processing"))">
+                                <div class="step-icon"><i class="fas fa-cog"></i></div>
+                                <span>Processing</span>
+                            </div>
+                            <div class="step @(GetStepClass(order.Status, "Shipped"))">
+                                <div class="step-icon"><i class="fas fa-truck"></i></div>
+                                <span>Shipped</span>
+                            </div>
+                            <div class="step @(GetStepClass(order.Status, "Delivered"))">
+                                <div class="step-icon"><i class="fas fa-home"></i></div>
+                                <span>Delivered</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-orders">
+            <div class="empty-icon">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <h3>No Orders Yet</h3>
+            <p>Looks like you haven't placed any orders yet</p>
+            <a href="/Product/Index" class="shop-now-btn">
+                <i class="fas fa-shopping-bag"></i> Start Shopping
+            </a>
+        </div>
+    }
+</div>
+
+@functions {
+    string GetStepClass(string status, string stepName)
+    {
+        var stepOrder = new[] { "Pending", "Processing", "Shipped", "Delivered" };
+        var currentIndex = Array.IndexOf(stepOrder, status);
+        var stepIndex = Array.IndexOf(stepOrder, stepName);
+        
+        if (currentIndex >= stepIndex)
+        {
+            return "completed";
+        }
+        return "";
+    }
+}
+
+<style>
+    .orders-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px;
+    }
+
+    .orders-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .page-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .page-subtitle {
+        color: var(--text-secondary);
+        font-size: 14px;
+    }
+
+    .orders-grid {
+        display: grid;
+        gap: 25px;
+    }
+
+    .order-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 25px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .order-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.2);
+        }
+
+        .order-card.delivered::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #2ecc71;
+        }
+
+        .order-card.cancelled::before {
+            background: #e74c3c;
+        }
+
+        .order-card.shipped::before {
+            background: #9b59b6;
+        }
+
+        .order-card.processing::before {
+            background: #3498db;
+        }
+
+        .order-card.pending::before {
+            background: #f39c12;
+        }
+
+    .order-status-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .status-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+    }
+
+    .status-text {
+        font-size: 14px;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+
+    .status-pending {
+        background: rgba(243, 156, 18, 0.15);
+        color: #f39c12;
+    }
+
+    .status-processing {
+        background: rgba(52, 152, 219, 0.15);
+        color: #3498db;
+    }
+
+    .status-shipped {
+        background: rgba(155, 89, 182, 0.15);
+        color: #9b59b6;
+    }
+
+    .status-delivered {
+        background: rgba(46, 204, 113, 0.15);
+        color: #2ecc71;
+    }
+
+    .status-cancelled {
+        background: rgba(231, 76, 60, 0.15);
+        color: #e74c3c;
+    }
+
+    .order-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .order-number, .order-date, .order-total {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+        .order-number i, .order-date i, .order-total i {
+            color: var(--accent);
+            width: 20px;
+        }
+
+    .order-total {
+        font-weight: 700;
+        color: var(--accent);
+    }
+
+    .order-items-preview {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: var(--bg-primary);
+        border-radius: 16px;
+    }
+
+    .preview-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+
+        .preview-item i {
+            color: var(--accent);
+            width: 20px;
+        }
+
+    .more-items {
+        font-size: 12px;
+        color: var(--accent);
+        margin-top: 5px;
+        padding-left: 30px;
+    }
+
+    .order-actions {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .btn-details, .btn-cancel, .btn-review {
+        padding: 8px 20px;
+        border-radius: 40px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-details {
+        background: var(--accent);
+        color: black;
+    }
+
+    .btn-cancel {
+        background: rgba(231, 76, 60, 0.15);
+        color: #e74c3c;
+    }
+
+    .btn-review {
+        background: rgba(46, 204, 113, 0.15);
+        color: #2ecc71;
+    }
+
+        .btn-details:hover, .btn-cancel:hover, .btn-review:hover {
+            transform: translateY(-2px);
+        }
+
+    .btn-details:hover {
+        box-shadow: 0 5px 15px rgba(198, 164, 63, 0.3);
+    }
+
+    .order-progress {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid var(--border);
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+    }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+    .step {
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        flex: 1;
+    }
+
+    .step-icon {
+        width: 36px;
+        height: 36px;
+        background: var(--bg-card);
+        border: 2px solid var(--border);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 8px;
+        transition: all 0.3s;
+    }
+
+    .step.completed .step-icon {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: black;
+    }
+
+    .step span {
+        font-size: 11px;
+        color: var(--text-secondary);
+    }
+
+    .step.completed span {
+        color: var(--accent);
+    }
+
+    /* Empty State */
+    .empty-orders {
+        text-align: center;
+        padding: 80px 40px;
+        background: var(--bg-card);
+        border-radius: 30px;
+        border: 1px solid var(--border);
+    }
+
+    .empty-icon i {
+        font-size: 80px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+    }
+
+    .empty-orders h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .empty-orders p {
+        color: var(--text-secondary);
+        margin-bottom: 25px;
+    }
+
+    .shop-now-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+        color: black;
+        padding: 12px 32px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+        .shop-now-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(198, 164, 63, 0.3);
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .orders-container {
+            padding: 20px;
+        }
+
+        .order-info {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .progress-steps {
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+            .progress-steps::before {
+                display: none;
+            }
+
+        .step {
+            flex: auto;
+            min-width: 70px;
+        }
+
+        .order-actions {
+            flex-direction: column;
+        }
+
+        .btn-details, .btn-cancel, .btn-review {
+            justify-content: center;
+        }
+    }
+</style>
+
+<script>
+    function cancelOrder(orderId) {
+        if (confirm('Are you sure you want to cancel this order?')) {
+            fetch('/Order/CancelOrder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId: orderId })
+            }).then(response => response.json()).then(data => {
+                if (data.success) {
+                    showToast('Order cancelled successfully!');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+    }
+
+    function writeReview(orderId) {
+        window.location.href = '/Product/WriteReview/' + orderId;
+    }
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2ecc71;
+            color: black;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+</script>
