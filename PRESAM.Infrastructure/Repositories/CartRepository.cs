@@ -43,5 +43,11 @@ namespace PRESAM.Infrastructure.Repositories
             _context.CartItems.Update(cartItem);
             await _context.SaveChangesAsync();
         }
+
+        public async Task AddCartItemAsync(CartItem cartItem)
+        {
+            await _context.CartItems.AddAsync(cartItem);
+            await _context.SaveChangesAsync();
+        }
     }
 }

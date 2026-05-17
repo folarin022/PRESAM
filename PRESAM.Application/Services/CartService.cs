@@ -92,7 +92,7 @@ namespace PRESAM.Application.Services
                     cart.CartItems = new List<CartItem>();
 
                 cart.CartItems.Add(cartItem);
-                await _cartRepository.UpdateAsync(cart);
+                await _cartRepository.AddCartItemAsync(cartItem);
             }
 
         }

@@ -3,12 +3,6 @@ using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PRESAM.Application.Services
 {
